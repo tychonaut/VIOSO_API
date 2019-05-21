@@ -3,6 +3,7 @@
 
 //#pragma comment( lib, "d3d11.lib" )
 
+#pragma pack( push, 4 )
 typedef struct ConstantBuffer
 {
 	FLOAT matView[16];
@@ -11,8 +12,181 @@ typedef struct ConstantBuffer
 	FLOAT offsScale[4];
 	FLOAT offsScaleCur[4];
 } ConstantBuffer;
+#pragma pack( pop )
 
 const FLOAT _black[4] = {0,0,0,1};
+
+bool SaveTex( LPCSTR path, ID3D11Device* dev, ID3D11DeviceContext* dc, ID3D11Texture2D* tex )
+{
+	bool ret = false;
+	// create CPU accessable texture
+	D3D11_TEXTURE2D_DESC descI = { 0 };
+	D3D11_TEXTURE2D_DESC desc = { 0 };
+	tex->GetDesc( &descI );
+	logStr( 3, "Input texture dump desc:\n"
+			"Width           = %i\n"
+			"Height          = %i\n"
+			"MipLevels       = %i\n"
+			"ArraySize       = %i\n"
+			"Format          = %i\n"
+			"SampleDesc      = {Count = %i, Quality = %i}\n"
+			"Usage           = %i\n"
+			"BindFlags       = %i\n"
+			"CPUAccessFlags  = %i\n"
+			"MiscFlags       = %i\n"
+			, descI.Width
+			, descI.Height
+			, descI.MipLevels
+			, descI.ArraySize
+			, descI.Format
+			, descI.SampleDesc.Count
+			, descI.SampleDesc.Quality
+			, descI.Usage
+			, descI.BindFlags
+			, descI.CPUAccessFlags
+			, descI.MiscFlags
+	);
+
+
+	desc.Format = descI.Format;
+	desc.Width = descI.Width;
+	desc.Height = descI.Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_STAGING;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+
+	ID3D11Texture2D* pTexMem = NULL;
+	HRESULT hr = dev->CreateTexture2D( &desc, NULL, &pTexMem );
+	if( SUCCEEDED( hr ) )
+	{
+		dc->CopyResource( pTexMem, tex );
+		D3D11_MAPPED_SUBRESOURCE res = { 0 };
+		if( SUCCEEDED( dc->Map( pTexMem, 0, D3D11_MAP_READ, 0, &res ) ) )
+		{
+			if( DXGI_FORMAT_R8G8B8A8_UNORM == desc.Format ||
+				DXGI_FORMAT_R8G8B8A8_TYPELESS == desc.Format ||
+				DXGI_FORMAT_R8G8B8A8_UNORM_SRGB == desc.Format ||
+				DXGI_FORMAT_R8G8B8A8_UINT == desc.Format ||
+				DXGI_FORMAT_R8G8B8A8_SNORM == desc.Format ||
+				DXGI_FORMAT_R8G8B8A8_SINT == desc.Format
+				)
+			{
+				BITMAPINFOHEADER hdr = { 0 };
+				hdr.biSize = sizeof( hdr );
+				hdr.biWidth = desc.Width;
+				hdr.biHeight = -LONG( desc.Height );
+				hdr.biPlanes = 1;
+				hdr.biBitCount = 32;
+				hdr.biSizeImage = res.RowPitch * desc.Height;
+
+				BITMAPFILEHEADER fh = { 0 };
+				fh.bfType = 'MB';
+				fh.bfOffBits = sizeof( fh ) + hdr.biSize;
+				fh.bfSize = fh.bfOffBits + hdr.biSizeImage;
+
+				// swivel RGBA to BGRA
+				unsigned char t = 0;
+				for( unsigned char* px = (unsigned char*)res.pData, *pxE = ( (unsigned char*)res.pData ) + hdr.biSizeImage;
+					 px != pxE; )
+				{
+					for( const unsigned char* pxLE = px + res.RowPitch; px != pxLE; px += 4 )
+					{
+						t = px[0];
+						px[0] = px[2];
+						px[2] = t;
+					}
+				}
+
+
+				FILE* f = NULL;
+				if( NO_ERROR == fopen_s( &f, path, "wb" ) )
+				{
+					fwrite( &fh, sizeof( fh ), 1, f );
+					fwrite( &hdr, sizeof( hdr ), 1, f );
+					fwrite( res.pData, hdr.biSizeImage, 1, f );
+					fclose( f );
+					ret = true;
+					logStr( 3, "Texture dumped to %s", path );
+				}
+				else
+				{
+					logStr( 3, "Could not write file %s", path );
+				}
+			}
+			/*
+			else if( DXGI_FORMAT_R16G16B16A16_TYPELESS == desc.Format ||
+					 DXGI_FORMAT_R16G16B16A16_UNORM == desc.Format ||
+					 DXGI_FORMAT_R16G16B16A16_UINT == desc.Format ||
+					 DXGI_FORMAT_R16G16B16A16_SNORM == desc.Format ||
+					 DXGI_FORMAT_R16G16B16A16_SINT == desc.Format
+				)
+			{
+				BITMAPINFOHEADER hdr = { 0 };
+				hdr.biSize = sizeof( hdr );
+				hdr.biWidth = desc.Width;
+				hdr.biHeight = -LONG( desc.Height );
+				hdr.biPlanes = 1;
+				hdr.biBitCount = 32;
+				hdr.biSizeImage = res.RowPitch * desc.Height;
+
+				BITMAPFILEHEADER fh = { 0 };
+				fh.bfType = 'MB';
+				fh.bfOffBits = sizeof( fh ) + hdr.biSize;
+				fh.bfSize = fh.bfOffBits + hdr.biSizeImage;
+
+				// swivel RGBA to BGRA
+				unsigned char t = 0;
+				unsigned char* pDst = new unsigned char[hdr.biSize];
+				unsigned char* pxD = pDst;
+				int padd = res.RowPitch / sizeof( unsigned short ) - 4 * desc.Width;
+				for( unsigned short* pxS = (unsigned short*)res.pData, *pxE = ( (unsigned short*)res.pData ) + hdr.biSizeImage;
+					 pxS != pxE; pxS+= padd )
+				{
+					for( const unsigned short* pxLE = pxS + (res.RowPitch / sizeof( unsigned short )); pxS != pxLE; pxS += 4, pxD+= 4 )
+					{
+						pxD[0] = unsigned short( pxS[1] >> 8 );
+						pxD[1] = unsigned short( pxS[2] >> 8 );
+						pxD[2] = unsigned short( pxS[0] >> 8 );
+						pxD[3] = unsigned short( pxS[3] >> 8 );
+					}
+				}
+
+
+				FILE* f = NULL;
+				if( NO_ERROR == fopen_s( &f, path, "wb" ) )
+				{
+					fwrite( &fh, sizeof( fh ), 1, f );
+					fwrite( &hdr, sizeof( hdr ), 1, f );
+					fwrite( res.pData, hdr.biSizeImage, 1, f );
+					fclose( f );
+					ret = true;
+					logStr( 3, "Texture dumped to %s", path );
+				}
+				else
+				{
+					logStr( 3, "Could not write file %s", path );
+				}
+			} */
+			else
+			{
+				logStr( 3, "Could not dump texture unknown format %i.", desc.Format );
+			}
+			dc->Unmap( pTexMem, 0 );
+		}
+		else
+		{
+			logStr( 3, "Could not map dump texture." );
+		}
+		SAFERELEASE( pTexMem );
+	}
+	else
+	{
+		logStr( 3, "Could not create dump texture (%08x).", hr );
+	}
+	return ret;
+}
 
 DX11WarpBlend::DX11WarpBlend( ID3D11Device* pDevice )
 : DXWarpBlend(),
@@ -33,6 +207,8 @@ DX11WarpBlend::DX11WarpBlend( ID3D11Device* pDevice )
   m_texCur(NULL),
   m_focusWnd(0),
   m_RasterState(NULL),
+  m_DepthState( NULL ),
+  m_BlendState( NULL ),
   m_Layout(NULL)
 {
 	if( NULL == m_device )
@@ -50,6 +226,8 @@ DX11WarpBlend::DX11WarpBlend( ID3D11Device* pDevice )
 DX11WarpBlend::~DX11WarpBlend(void)
 {
 	SAFERELEASE( m_Layout );
+	SAFERELEASE( m_DepthState );
+	SAFERELEASE( m_BlendState );
 	SAFERELEASE( m_RasterState );
 	SAFERELEASE( m_texCur );
 	SAFERELEASE( m_texWarpCalc );
@@ -151,7 +329,14 @@ VWB_ERROR DX11WarpBlend::Init( VWB_WarpBlendSet& wbs )
 
 		ID3DBlob* pVSBlob = NULL;
 		ID3DBlob* pErrBlob = NULL;
-		hr = D3DCompile( s_pixelShaderDX4, sizeof(s_pixelShaderDX4), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pVSBlob, &pErrBlob );
+		if( bFlipDXVs )
+		{
+			hr = D3DCompile( s_pixelShaderDX4_vFlip, sizeof( s_pixelShaderDX4_vFlip ), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pVSBlob, &pErrBlob );
+		}
+		else
+		{
+			hr = D3DCompile( s_pixelShaderDX4, sizeof( s_pixelShaderDX4 ), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pVSBlob, &pErrBlob );
+		}
 		if( FAILED( hr ) )
 		{
 			logStr( 0, "ERROR: The vertex shader code cannot be compiled: %s\n", pErrBlob->GetBufferPointer() );
@@ -227,6 +412,29 @@ VWB_ERROR DX11WarpBlend::Init( VWB_WarpBlendSet& wbs )
 			throw VWB_ERROR_GENERIC;
 		}
 
+		D3D11_DEPTH_STENCIL_DESC dsdesc;
+		memset( &dsdesc, 0, sizeof( dsdesc ) );
+		dsdesc.DepthEnable = FALSE;
+		dsdesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsdesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+		hr = m_device->CreateDepthStencilState( &dsdesc, &m_DepthState );
+		if( FAILED( hr ) )
+		{
+			logStr( 0, "ERROR: Could not create depth state: %08X\n", hr );
+			throw VWB_ERROR_GENERIC;
+		}
+
+		D3D11_BLEND_DESC bdesc;
+		memset( &bdesc, 0, sizeof( bdesc ) );
+		bdesc.RenderTarget[0].BlendEnable = FALSE;
+		bdesc.RenderTarget[0].RenderTargetWriteMask = 0xF;
+		hr = m_device->CreateBlendState( &bdesc, &m_BlendState );
+		if( FAILED( hr ) )
+		{
+			logStr( 0, "ERROR: Could not create blend state: %08X\n", hr );
+			throw VWB_ERROR_GENERIC;
+		}
+
 		// Compile the pixel shader
         std::string pixelShader = "PS"; // or "TST"
 #if 1
@@ -243,7 +451,14 @@ VWB_ERROR DX11WarpBlend::Init( VWB_WarpBlendSet& wbs )
 #endif
 		ID3DBlob* pPSBlob = NULL;
 		SAFERELEASE( pErrBlob );
-		hr = D3DCompile( s_pixelShaderDX4, sizeof(s_pixelShaderDX4), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
+		if( bFlipDXVs )
+		{
+			hr = D3DCompile( s_pixelShaderDX4_vFlip, sizeof( s_pixelShaderDX4_vFlip ), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
+		}
+		else
+		{
+			hr = D3DCompile( s_pixelShaderDX4, sizeof( s_pixelShaderDX4 ), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
+		}
 		if( FAILED( hr ) )
 		{
 			logStr( 0, "ERROR: The pixel shader code cannot be compiled (%08X): %s\n", hr, pErrBlob->GetBufferPointer() );
@@ -305,83 +520,192 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 	if( VWB_STATEMASK_STANDARD == stateMask )
 		stateMask = VWB_STATEMASK_DEFAULT;
 
+	logStr( 5, "RenderDX11..." );
 	if( NULL == m_PixelShader || NULL == m_device )
+	{
+		logStr( 3, "DX device or shader program not available.\n" );
 		return VWB_ERROR_GENERIC;
+	}
+
+	ID3D11DeviceContext* ctx = NULL;
+	m_device->GetImmediateContext( &ctx );
+	if( ctx != m_dc )
+	{
+		logStr( 3, "DX got other immediate context. Stop.\n" );
+		SAFERELEASE( ctx );
+		return VWB_ERROR_PARAMETER;
+	}
+	SAFERELEASE( ctx );
 
 	ID3D11DepthStencilView* pDSV = NULL;
 	ID3D11RenderTargetView* pRTV = NULL;
 	m_dc->OMGetRenderTargets( 1, &pRTV, &pDSV );
+	if( NULL == pRTV )
+	{
+		logStr( 3, "Render target not available.\n" );
+		return VWB_ERROR_GENERIC;
+	}
 
 	// do backbuffer copy if necessary
-	if( NULL == inputTexture )
+	if( NULL == inputTexture ||
+		VWB_UNDEFINED_GL_TEXTURE == inputTexture )
 	{
-		if( pRTV )
+		ID3D11Resource* pRes = NULL;
+		pRTV->GetResource( &pRes );
+		if( pRes )
 		{
-			ID3D11Resource* pRes = NULL;
-			pRTV->GetResource( &pRes );
-			if( pRes )
+			ID3D11Texture2D* pTex;
+			if( SUCCEEDED( pRes->QueryInterface( &pTex ) ) )
 			{
-				ID3D11Texture2D* pTex;
-				if( SUCCEEDED( pRes->QueryInterface( __uuidof( ID3D11Texture2D ), (void**)&pTex ) ) )
+				if( 3 < g_logLevel )
 				{
-					D3D11_TEXTURE2D_DESC desc;
-					pTex->GetDesc( &desc );
-					pTex->Release();
-					if( NULL == m_texBB ||
-						desc.Width != m_sizeIn.cx ||
-						desc.Height != m_sizeIn.cy )
+					char path[MAX_PATH];
+					strcpy_s( path, g_logFilePath );
+					strcat_s( path, ".bb.bmp" );
+					SaveTex( path, m_device, m_dc, pTex );
+				}
+				D3D11_TEXTURE2D_DESC desc;
+				pTex->GetDesc( &desc );
+				pTex->Release();
+				if( NULL == m_texBB ||
+					desc.Width != m_sizeIn.cx ||
+					desc.Height != m_sizeIn.cy )
+				{
+					logStr( 1, "new backbuffer texture resource attached." );
+					logStr( 3, "Backbuffer texture desc:\n"
+							"Width           = %i\n"
+							"Height          = %i\n"
+							"MipLevels       = %i\n"
+							"ArraySize       = %i\n"
+							"Format          = %i\n"
+							"SampleDesc      = {Count = %i, Quality = %i}\n"
+							"Usage           = %i\n"
+							"BindFlags       = %i\n"
+							"CPUAccessFlags  = %i\n"
+							"MiscFlags       = %i\n"
+							, desc.Width
+							, desc.Height
+							, desc.MipLevels
+							, desc.ArraySize
+							, desc.Format
+							, desc.SampleDesc.Count
+							, desc.SampleDesc.Quality
+							, desc.Usage
+							, desc.BindFlags
+							, desc.CPUAccessFlags
+							, desc.MiscFlags
+					);
+
+					pTex = NULL;
+					//desc.Format = DXGI_FORMAT_R8G8B8A8_UINT;
+					desc.Usage = D3D11_USAGE_DEFAULT;
+					desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+					desc.CPUAccessFlags = 0;
+					desc.ArraySize = 1;
+					desc.MipLevels = 1;
+					desc.MiscFlags = 0;
+
+					logStr( 3, "Clone texture desc:\n"
+							"Width           = %i\n"
+							"Height          = %i\n"
+							"MipLevels       = %i\n"
+							"ArraySize       = %i\n"
+							"Format          = %i\n"
+							"SampleDesc      = {Count = %i, Quality = %i}\n"
+							"Usage           = %i\n"
+							"BindFlags       = %i\n"
+							"CPUAccessFlags  = %i\n"
+							"MiscFlags       = %i\n"
+							, desc.Width
+							, desc.Height
+							, desc.MipLevels
+							, desc.ArraySize
+							, desc.Format
+							, desc.SampleDesc.Count
+							, desc.SampleDesc.Quality
+							, desc.Usage
+							, desc.BindFlags
+							, desc.CPUAccessFlags
+							, desc.MiscFlags
+					);
+
+					res = m_device->CreateTexture2D( &desc, NULL, &pTex );
+					m_sizeIn.cx = desc.Width;
+					m_sizeIn.cy = desc.Height;
+					m_vp.Width = (FLOAT)desc.Width;
+					m_vp.Height = (FLOAT)desc.Height;
+					if( SUCCEEDED( res ) )
 					{
-						pTex = NULL;
-						desc.Usage = D3D11_USAGE_DEFAULT;
-						desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-						desc.CPUAccessFlags = 0;
-						desc.ArraySize = 1;
-						desc.MipLevels = 1;
-						desc.MiscFlags = 0;
-						res = m_device->CreateTexture2D( &desc, NULL, &pTex );
-						m_sizeIn.cx = desc.Width;
-						m_sizeIn.cy = desc.Height;
+						D3D11_SHADER_RESOURCE_VIEW_DESC descSRV;
+						descSRV.Format = desc.Format;
+						descSRV.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+						descSRV.Texture2D.MipLevels= 1;
+						descSRV.Texture2D.MostDetailedMip = 0;
+						res = m_device->CreateShaderResourceView( (ID3D11Resource*)pTex, &descSRV, &m_texBB );
+						pTex->Release();
 						if( SUCCEEDED( res ) )
 						{
-							D3D11_SHADER_RESOURCE_VIEW_DESC descSRV;
-							descSRV.Format = desc.Format;
-							descSRV.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-							descSRV.Texture2D.MipLevels= 1;
-							descSRV.Texture2D.MostDetailedMip = 0;
-							m_device->CreateShaderResourceView( (ID3D11Resource*)pTex, &descSRV, &m_texBB );
-							pTex->Release();
+							logStr( 2, "Backbuffer cloned." );
 						}
 						else
+						{
+							logStr( 2, "Failed to create clone texture view (%0x08x).\n", res );
+							SAFERELEASE( m_texBB );
 							return VWB_ERROR_GENERIC;
+						}
+					}
+					else
+					{
+						logStr( 2, "Failed to create clone texture from current render target.\n" );
+						return VWB_ERROR_GENERIC;
 					}
 				}
 				else
-					return VWB_ERROR_GENERIC;
-
-				if( NULL != m_texBB )
 				{
-					ID3D11Resource* pResDst = NULL;
-					m_texBB->GetResource( &pResDst );
-					m_dc->CopyResource( pResDst, pRes );
-					SAFERELEASE( pResDst );
+					logStr( 2, "Backbuffer texture format: %i \n", desc.Format );
 				}
-				pRes->Release();
 			}
 			else
+			{
+				logStr( 2, "Failed to get attached texture from render target; cannot copy.\n" );
 				return VWB_ERROR_GENERIC;
+			}
+
+			if( NULL != m_texBB )
+			{
+				logStr( 4, "Copy backbuffer to input texture..." );
+				ID3D11Resource* pResDst = NULL;
+				m_texBB->GetResource( &pResDst );
+				m_dc->CopyResource( pResDst, pRes );
+				SAFERELEASE( pResDst );
+				logStr( 4, " Done.\n" );
+			}
+			else
+			{
+				logStr( 3, "Error: Missing backbuffer resource to copy." );
+			}
+			pRes->Release();
 		}
 		else
+		{
+			logStr( 2, "Failed to get attached resource from render target; cannot copy.\n" );
 			return VWB_ERROR_GENERIC;
+		}
 	}
 	else
 	{
-		ID3D11Texture2D* pResIn = (ID3D11Texture2D*)inputTexture;
+		ID3D11Texture2D* pTexIn = NULL;
+		if( FAILED( ((IUnknown *)inputTexture)->QueryInterface( &pTexIn ) ) )
+		{
+			logStr( 2, "Failed to query ID3D11Texture2D input texture.\n" );
+			return VWB_ERROR_PARAMETER;
+		}
 
 		if( NULL != m_texBB )
 		{
 			ID3D11Resource* pRes = NULL;
 			m_texBB->GetResource( &pRes );
-			if( pRes != pResIn )
+			if( pRes != pTexIn )
 			{
 				m_texBB->Release();
 				m_texBB = NULL;
@@ -391,21 +715,90 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 		if( NULL == m_texBB )
 		{
 			D3D11_TEXTURE2D_DESC descTex;
-			pResIn->GetDesc( &descTex );
+			pTexIn->GetDesc( &descTex );
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			desc.Format = descTex.Format;
+			if( DXGI_FORMAT_R16G16B16A16_TYPELESS == descTex.Format )
+			{
+				desc.Format = DXGI_FORMAT_R16G16B16A16_UINT;
+
+			}
+			else
+			{
+				desc.Format = descTex.Format;
+			}
+
 			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			desc.Texture2D.MipLevels = 1;
 			desc.Texture2D.MostDetailedMip = 0;
 
-			res = m_device->CreateShaderResourceView( pResIn, &desc, &m_texBB );
-            if (FAILED(res))
-                return VWB_ERROR_GENERIC;
+			res = m_device->CreateShaderResourceView( pTexIn, &desc, &m_texBB );
+			pTexIn->Release();
+			if( FAILED( res ) )
+			{
+				logStr( 2, "Failed to create resource view from input texture.\n" );
+				return VWB_ERROR_GENERIC;
+			}
 
 			m_sizeIn.cx = descTex.Width;
 			m_sizeIn.cy = descTex.Height;
+			m_vp.Width = (FLOAT)descTex.Width;
+			m_vp.Height = (FLOAT)descTex.Height;
+			logStr( 2, "Input texture resource attached." );
+			logStr( 3, "Input texture desc:\n"
+                    "Width           = %i\n"
+                    "Height          = %i\n"
+                    "MipLevels       = %i\n"
+                    "ArraySize       = %i\n"
+                    "Format          = %i\n"
+                    "SampleDesc      = {Count = %i, Quality = %i}\n"
+                    "Usage           = %i\n"
+                    "BindFlags       = %i\n"
+                    "CPUAccessFlags  = %i\n"
+                    "MiscFlags       = %i\n"
+                    , descTex.Width
+					, descTex.Height
+					, descTex.MipLevels
+					, descTex.ArraySize
+					, descTex.Format
+					, descTex.SampleDesc.Count
+					, descTex.SampleDesc.Quality
+					, descTex.Usage
+					, descTex.BindFlags
+					, descTex.CPUAccessFlags
+					, descTex.MiscFlags
+			);
+		}
+		SAFERELEASE( pTexIn );
+	}
+
+	if( 3 < g_logLevel )
+	{
+		ID3D11Resource* pRes = NULL;
+		m_texBB->GetResource( &pRes );
+
+		if( NULL != pRes )
+		{
+			ID3D11Texture2D* pTex = NULL;
+			if( SUCCEEDED( pRes->QueryInterface( &pTex ) ) )
+			{
+				char path[MAX_PATH];
+				strcpy_s( path, g_logFilePath );
+				strcat_s( path, ".texin.bmp" );
+				SaveTex( path, m_device, m_dc, pTex );
+				SAFERELEASE( pTex );
+			}
+			else
+			{
+				logStr( 3, "Could not query input texture." );
+			}
+			SAFERELEASE( pRes );
+		}
+		else
+		{
+			logStr( 3, "Could not get input resource." );
 		}
 	}
+	logStr( 5, "RenderDX11, input tex set." );
 
 /////////////// save state
 	ID3D11Buffer* pOldVtx = NULL;
@@ -414,12 +807,21 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 	ID3D11InputLayout* pOldLayout = NULL;
 	D3D11_PRIMITIVE_TOPOLOGY oldTopo = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	ID3D11RasterizerState* pOldRS = NULL;
+	ID3D11BlendState* pOldBS = NULL;
+	ID3D11DepthStencilState* pOldDS = NULL;
 
 	ID3D11VertexShader* pOldVS = NULL;
-	ID3D11Buffer* pOldCB = NULL;
+	ID3D11Buffer* pOldCBVS = NULL;
+	ID3D11Buffer* pOldCBPS = NULL;
 	ID3D11PixelShader* pOldPS = NULL;
-	ID3D11ShaderResourceView* ppOldSRV[3] = {0};
-	ID3D11SamplerState* ppOldSS[3] = {0};
+	ID3D11ShaderResourceView* ppOldSRV[4] = {0};
+	FLOAT bf[4] = { 1,1,1,1 };
+	UINT dsm = 0xFFFFFFFF;
+
+	ID3D11SamplerState* ppOldSS[4] = {0};
+
+	UINT oldNVP = 0;
+	D3D11_VIEWPORT pOldVP[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE] = { 0 };
 
 	if( VWB_STATEMASK_VERTEX_BUFFER & stateMask )
 		m_dc->IAGetVertexBuffers( 0, 1, &pOldVtx, &oldStride, &oldOffset );
@@ -428,29 +830,31 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 	if( VWB_STATEMASK_PRIMITIVE_TOPOLOGY & stateMask )
 	    m_dc->IAGetPrimitiveTopology( &oldTopo );
 	if( VWB_STATEMASK_RASTERSTATE & stateMask )
+	{
+		m_dc->RSGetViewports( &oldNVP, NULL );
+		m_dc->RSGetViewports( &oldNVP, pOldVP );
 		m_dc->RSGetState( &pOldRS );
+		m_dc->OMGetBlendState( &pOldBS, bf, &dsm );
+		m_dc->OMGetDepthStencilState( &pOldDS, 0 );
+	}
 
 	if( VWB_STATEMASK_VERTEX_SHADER & stateMask )
 		m_dc->VSGetShader( &pOldVS, NULL, NULL );
 	if( VWB_STATEMASK_PIXEL_SHADER & stateMask )
 		m_dc->PSGetShader( &pOldPS, NULL, NULL );
 	if( VWB_STATEMASK_SHADER_RESOURCE & stateMask )
-		m_dc->PSGetShaderResources( 0, 3, ppOldSRV );
+		m_dc->PSGetShaderResources( 0, 4, ppOldSRV );
 	if( VWB_STATEMASK_SAMPLER & stateMask )
-		m_dc->PSGetSamplers( 0, 3, ppOldSS );
+		m_dc->PSGetSamplers( 0, 4, ppOldSS );
 	if( VWB_STATEMASK_CONSTANT_BUFFER & stateMask )
-		m_dc->PSGetConstantBuffers( 0, 1, &pOldCB );
+	{
+		m_dc->VSGetConstantBuffers( 0, 1, &pOldCBVS );
+		m_dc->PSGetConstantBuffers( 0, 1, &pOldCBPS );
+	}
 
 ////////////// set state
 	UINT stride = sizeof( SimpleVertex );
     UINT offset = 0;
-    m_dc->IASetVertexBuffers( 0, 1, &m_VertexBuffer, &stride, &offset );
-	m_dc->IASetInputLayout( m_Layout );
-    m_dc->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	m_dc->VSSetShader( m_VertexShader, NULL, 0 );
-
-	m_dc->RSSetState( m_RasterState );
 
 	ConstantBuffer cb;
 	memcpy( cb.matView, m_mVP.Transposed(), sizeof( cb.matView ) );
@@ -602,8 +1006,18 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 		cb.offsScaleCur[3] = 1.0f;
 	}
 
-	m_dc->PSSetShader( m_PixelShader, NULL, 0 );
 	m_dc->UpdateSubresource( m_ConstantBuffer, 0, NULL, &cb, 0, 0 );
+
+	m_dc->IASetVertexBuffers( 0, 1, &m_VertexBuffer, &stride, &offset );
+	m_dc->IASetInputLayout( m_Layout );
+	m_dc->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	m_dc->VSSetShader( m_VertexShader, NULL, 0 );
+	m_dc->VSSetConstantBuffers( 0, 1, &m_ConstantBuffer );
+
+	m_dc->RSSetState( m_RasterState );
+	//m_dc->RSSetViewports( 1, &m_vp );
+	m_dc->PSSetShader( m_PixelShader, NULL, 0 );
 	m_dc->PSSetConstantBuffers( 0, 1, &m_ConstantBuffer );
 	m_dc->PSSetShaderResources( 0, 1, &m_texBB );
 	m_dc->PSSetShaderResources( 1, 1, &m_texWarp );
@@ -611,6 +1025,9 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 	m_dc->PSSetShaderResources( 3, 1, &m_texCur );
 	m_dc->PSSetSamplers( 0, 1, &m_SSLin );
 	m_dc->PSSetSamplers( 1, 1, &m_SSClamp );
+
+	m_dc->OMSetBlendState( m_BlendState, NULL, 0xFFFFFFFF );
+	m_dc->OMSetDepthStencilState( m_DepthState, 0 );
 
 	////////////// draw
 	if( pDSV )
@@ -628,22 +1045,27 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 
 /////////// restore state
 	if( VWB_STATEMASK_CONSTANT_BUFFER & stateMask )
-		m_dc->PSSetConstantBuffers( 0, 1, &pOldCB );
+	{
+		m_dc->VSSetConstantBuffers( 0, 1, &pOldCBVS );
+		m_dc->PSSetConstantBuffers( 0, 1, &pOldCBPS );
+	}
 
 	if( VWB_STATEMASK_SAMPLER & stateMask )
 	{
-		m_dc->PSSetSamplers( 0, 3, ppOldSS );
+		m_dc->PSSetSamplers( 0, 4, ppOldSS );
 		SAFERELEASE( ppOldSS[0] );
 		SAFERELEASE( ppOldSS[1] );
 		SAFERELEASE( ppOldSS[2] );
+		SAFERELEASE( ppOldSS[3] );
 	}
 
 	if( VWB_STATEMASK_SHADER_RESOURCE & stateMask )
 	{
-		m_dc->PSSetShaderResources( 0, 3, ppOldSRV );
+		m_dc->PSSetShaderResources( 0, 4, ppOldSRV );
 		SAFERELEASE( ppOldSRV[0] );
 		SAFERELEASE( ppOldSRV[1] );
 		SAFERELEASE( ppOldSRV[2] );
+		SAFERELEASE( ppOldSRV[3] );
 	}
 
 	if( VWB_STATEMASK_PIXEL_SHADER & stateMask )
@@ -661,11 +1083,30 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 		}
 
 	if( VWB_STATEMASK_RASTERSTATE & stateMask )
+	{
 		if( pOldRS )
 		{
 			m_dc->RSSetState( pOldRS );
 			pOldRS->Release();
 		}
+
+		if( pOldBS )
+		{
+			m_dc->OMSetBlendState( pOldBS, bf, dsm );
+			pOldBS->Release();
+		}
+
+		if( pOldDS )
+		{
+			m_dc->OMSetDepthStencilState( pOldDS, 0 );
+			pOldDS->Release();
+		}
+
+		if( 0 != oldNVP && 0 != pOldVP[0].Width )
+		{
+			m_dc->RSSetViewports( oldNVP, pOldVP );
+		}
+	}
 
 	if( VWB_STATEMASK_PRIMITIVE_TOPOLOGY & stateMask )
 		m_dc->IASetPrimitiveTopology( oldTopo );

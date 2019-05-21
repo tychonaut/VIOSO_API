@@ -333,14 +333,10 @@ VWB_ERROR VWB_CreateA( void* pDxDevice, char const* szConfigFile, char const* sz
 		logStr( 0, "FATAL: Error %d creating warper \"%s\".\n", e, szChannelName ? szChannelName : (*ppWarper)->channel );
 		return (VWB_ERROR)e;
 	}
-	time_t t;
-	time( &t );
-	struct tm tm = *localtime( &t );
 	if( NULL != szConfigFile && 0 != szConfigFile[0] )
 	{
 		if( !((VWB_Warper_base*)*ppWarper)->ReadIniFile( szConfigFile, szChannelName ) )
 		{
-			logStr( 1, "%04d/%02d/%02d VIOSOWarpBlend API %d.%d.%d.%d.\n", 1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday, VWB_Version_MAJ,VWB_Version_MIN,VWB_Version_MAI,VWB_Version_REV );
 			logStr( 0, "FATAL: .ini file (%s) parsing error.\n", szConfigFile );
 			delete ((VWB_Warper_base*)*ppWarper);
 			*ppWarper = NULL;
@@ -355,8 +351,12 @@ VWB_ERROR VWB_CreateA( void* pDxDevice, char const* szConfigFile, char const* sz
 			strcpy( ((VWB_Warper_base*)*ppWarper)->channel, "default" );
 	}
 
-	logStr( 1, "%04d/%02d/%02d VIOSOWarpBlend API %d.%d.%d.%d.\n", 1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday, VWB_Version_MAJ,VWB_Version_MIN,VWB_Version_MAI,VWB_Version_REV );
 	{
+		time_t t;
+		time( &t );
+		struct tm tm = *localtime( &t );
+		logStr( 1, "%04d/%02d/%02d VIOSOWarpBlend API %d.%d.%d.%d.\n", 1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday, VWB_Version_MAJ, VWB_Version_MIN, VWB_Version_MAI, VWB_Version_REV );
+
 		char* szModPath = NULL;
 #ifdef WIN32
 		char modPath[MAX_PATH] = {0};
@@ -374,8 +374,8 @@ VWB_ERROR VWB_CreateA( void* pDxDevice, char const* szConfigFile, char const* sz
 				"calibIndex=%d\n"
 				"bTurnWithView=%d\n"
 				"bDoNotBlend=%d\n"
-				"eyeProvider=%s\n"
-				"eyeProviderParam=%s\n"
+				"eyePointProvider=%s\n"
+				"eyePointProviderParam=%s\n"
 				"eye=[%.5f, %.5f, %.5f]\n"
 				"near=%.5f\n"
 				"far=%.5f\n"
@@ -568,10 +568,76 @@ void VWB_Destroy( VWB_Warper* pWarper )
 		delete (VWB_Warper_base*)pWarper;
 }
 
-VWB_ERROR VWB_getViewProj( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot,  VWB_float* pView,  VWB_float* pProj )
+VWB_ERROR VWB_getViewProj( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot, VWB_float* pView, VWB_float* pProj )
 {
+
+	if( NULL != pEye && NULL != pRot )
+	{
+		logStr( 4, "VWB_getViewProj\n IN:   eye: (%f, %f, %f)\n"
+				"       rot: (%f, %f, %f)\n"
+				, pEye[0], pEye[1], pEye[2]
+				, pRot[0], pRot[1], pRot[2]
+		);
+	}
 	if( pWarper )
-		return ((VWB_Warper_base*)pWarper)->GetViewProjection( pEye, pRot, pView, pProj );
+	{
+		VWB_ERROR err = ( (VWB_Warper_base*)pWarper )->GetViewProjection( pEye, pRot, pView, pProj );
+		if( NULL != pView && NULL != pProj )
+		{
+			logStr( 4,
+					" OUT: view: (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"      proj: (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					, pView[0], pView[1], pView[2], pView[3]
+					, pView[4], pView[5], pView[6], pView[7]
+					, pView[8], pView[9], pView[10], pView[11]
+					, pView[12], pView[13], pView[14], pView[15]
+					, pProj[0], pProj[1], pProj[2], pProj[3]
+					, pProj[4], pProj[5], pProj[6], pProj[7]
+					, pProj[8], pProj[9], pProj[10], pProj[11]
+					, pProj[12], pProj[13], pProj[14], pProj[15]
+			);
+		}
+		return err;
+	}
+	return VWB_ERROR_PARAMETER;
+}
+
+VWB_ERROR VWB_getViewClip( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot, VWB_float* pView, VWB_float* pClip )
+{
+	if( NULL != pEye && NULL != pRot )
+	{
+		logStr( 4, "VWB_getViewClip\n IN:   eye: (%f, %f, %f)\n"
+				"       rot: (%f, %f, %f)\n"
+				, pEye[0], pEye[1], pEye[2]
+				, pRot[0], pRot[1], pRot[2]
+		);
+	}
+	if( pWarper )
+	{
+		VWB_ERROR err = ( (VWB_Warper_base*)pWarper )->GetViewClip( pEye, pRot, pView, pClip );
+		if( NULL != pView && NULL != pClip )
+		{
+			logStr( 4,
+					" OUT: view: (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"            (%f, %f, %f, %f)\n"
+					"      clip: (%f, %f, %f, %f, %f, %f)\n"
+					, pView[0], pView[1], pView[2], pView[3]
+					, pView[4], pView[5], pView[6], pView[7]
+					, pView[8], pView[9], pView[10], pView[11]
+					, pView[12], pView[13], pView[14], pView[15]
+					, pClip[0], pClip[1], pClip[2], pClip[3], pClip[4], pClip[5]
+			);
+		}
+		return err;
+	}
 	return VWB_ERROR_PARAMETER;
 }
 
@@ -584,6 +650,7 @@ VWB_ERROR VWB_setViewProj( VWB_Warper* pWarper, VWB_float* pView,  VWB_float* pP
 
 VWB_ERROR VWB_render( VWB_Warper* pWarper, VWB_param inputTexture, VWB_uint restoreMask )
 {
+	logStr( 4, "VWB_Render" );
 	if( NULL == pWarper )
 		return VWB_ERROR_PARAMETER;
 	VWB_ERROR err = ((VWB_Warper_base*)pWarper)->Render( inputTexture, restoreMask );
@@ -1029,26 +1096,26 @@ VWB_ERROR VWB_Warper_base::GetViewProjection( VWB_float* eye, VWB_float* rot, VW
 {
 	// receive the current car parameters
 	::memset( &m_ep, 0, sizeof( m_ep ) );
-	if (m_hEPP && m_fnEPPGet) // try eye porvider
+	if( m_hEPP && m_fnEPPGet ) // try eye porvider
 	{
-		m_fnEPPGet(m_hEPP, &m_ep);
-		if (eye)
+		m_fnEPPGet( m_hEPP, &m_ep );
+		if( eye )
 		{
 			eye[0] = (float)m_ep.x;
 			eye[1] = (float)m_ep.y;
 			eye[2] = (float)m_ep.z;
 		}
-		if (rot)
+		if( rot )
 		{
 			rot[0] = (float)m_ep.pitch;
 			rot[1] = (float)m_ep.yaw;
 			rot[2] = (float)m_ep.roll;
 		}
 
-		logStr(3, "INFO: EyePointReceiver %s input for channel [%s]: pos=[%01.3f,%01.3f,%01.3f] dir=[%01.3f,%01.3f,%01.3f].\n",
-			eyeProviderParam, channel,
-			m_ep.x, m_ep.y, m_ep.z,
-			m_ep.pitch, m_ep.yaw, m_ep.roll);
+		logStr( 3, "INFO: EyePointReceiver %s input for channel [%s]: pos=[%01.3f,%01.3f,%01.3f] dir=[%01.3f,%01.3f,%01.3f].\n",
+				eyeProviderParam, channel,
+				m_ep.x, m_ep.y, m_ep.z,
+				m_ep.pitch, m_ep.yaw, m_ep.roll );
 	}
 	else
 	{ // use given
@@ -1060,13 +1127,68 @@ VWB_ERROR VWB_Warper_base::GetViewProjection( VWB_float* eye, VWB_float* rot, VW
 
 		if( NULL != eye && NULL != rot )
 			logStr( 3, "INFO: Eyepoint from call for channel [%s]: pos=[%01.3f,%01.3f,%01.3f] dir=[%01.3f,%01.3f,%01.3f].\n",
-				channel,
-				eye[0],eye[1],eye[2],
-				rot[0],rot[1],rot[2] );
+					channel,
+					eye[0], eye[1], eye[2],
+					rot[0], rot[1], rot[2] );
 	}
 
 	return VWB_ERROR_NONE;
 }
+
+VWB_ERROR VWB_Warper_base::GetViewClip( VWB_float* eye, VWB_float* rot, VWB_float* pView, VWB_float* pClip )
+{
+	// receive the current car parameters
+	::memset( &m_ep, 0, sizeof( m_ep ) );
+	if( m_hEPP && m_fnEPPGet ) // try eye porvider
+	{
+		m_fnEPPGet( m_hEPP, &m_ep );
+		if( eye )
+		{
+			eye[0] = (float)m_ep.x;
+			eye[1] = (float)m_ep.y;
+			eye[2] = (float)m_ep.z;
+		}
+		if( rot )
+		{
+			rot[0] = (float)m_ep.pitch;
+			rot[1] = (float)m_ep.yaw;
+			rot[2] = (float)m_ep.roll;
+		}
+
+		logStr( 3, "INFO: EyePointReceiver %s input for channel [%s]: pos=[%01.3f,%01.3f,%01.3f] dir=[%01.3f,%01.3f,%01.3f].\n",
+				eyeProviderParam, channel,
+				m_ep.x, m_ep.y, m_ep.z,
+				m_ep.pitch, m_ep.yaw, m_ep.roll );
+	}
+	else
+	{ // use given
+		if( eye )
+			spliceVec( m_ep.x, m_ep.y, m_ep.z, eye[0], eye[1], eye[2], ( splice >> 16 ) );
+
+		if( rot )
+			spliceVec( m_ep.pitch, m_ep.yaw, m_ep.roll, rot[0], rot[1], rot[2], splice );
+
+		if( NULL != eye && NULL != rot )
+			logStr( 3, "INFO: Eyepoint from call for channel [%s]: pos=[%01.3f,%01.3f,%01.3f] dir=[%01.3f,%01.3f,%01.3f].\n",
+					channel,
+					eye[0], eye[1], eye[2],
+					rot[0], rot[1], rot[2] );
+	}
+
+	return VWB_ERROR_NONE;
+}
+
+void VWB_Warper_base::getClip( VWB_VEC3f const& e, VWB_float * pClip )
+{
+	VWB_float dd = nearDist / ( screenDist - e.z );
+	pClip[0] = ( m_viewSizes[0] + e.x ) * dd;
+	pClip[1] = ( m_viewSizes[1] + e.y ) * dd;
+	pClip[2] = ( m_viewSizes[2] - e.x ) * dd;
+	pClip[3] = ( m_viewSizes[3] - e.y ) * dd;
+	pClip[4] = nearDist;
+	pClip[5] = farDist;
+}
+
 
 void VWB_Warper_base::Defaults()
 {
@@ -1315,6 +1437,48 @@ VWB_ERROR VWB_Warper_base::AutoView( VWB_WarpBlend const& wb )
 	return VWB_ERROR_NONE;
 }
 
+VWB_ERROR VWB_Warper_base::Render( VWB_param inputTexture, VWB_uint stateMask )
+{
+	if( 0 != port )
+	{
+		for( auto listener = g_listeners.begin(); listener != g_listeners.end(); listener++ )
+		{
+			if( this == listener->ptr->getWarper( channel ) )
+			{
+				VWBTCPConnection* conn = dynamic_cast<VWBTCPConnection*>( listener->ptr );
+				if( conn )
+				{
+					HttpRequest const* req = conn->headRequestPtr();
+					if( nullptr != req )
+					{
+						if( !req->files.empty() )
+						{
+							for( auto file = req->files.begin(); file != req->files.end(); file++ )
+							{
+								if( file->first == "inifile" )
+								{
+									// TODO ovrewrite current ini file
+								}
+							}
+						}
+						if( !req->postData.empty() )
+						{
+							for( auto post = req->postData.begin(); post != req->postData.end(); post++ )
+							{
+								if( post->first == "jasonrpc" )
+								{
+									//post->second
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+		return VWB_ERROR_NONE;
+}
+
 VWB_ERROR VWB_Warper_base::getWarpMesh( VWB_int cols, VWB_int rows, VWB_WarpBlendMesh& mesh )
 {
 	return VWB_ERROR_NOT_IMPLEMENTED;
@@ -1373,37 +1537,36 @@ VWB_ERROR Dummywarper::GetViewProjection( VWB_float* eye, VWB_float* rot, VWB_fl
 
 		// we transform the dynamic eye-point to the constant view:
 
-		// copy eye coordinate to eb
+		// copy eye coordinate to e
 		VWB_VEC3f e( (float)m_ep.x, (float)m_ep.y, (float)m_ep.z );
 
 		// rotation matrix from angles
 		VWB_MAT44f R = m_bRH ? VWB_MAT44f::R( (VWB_float)m_ep.pitch, (VWB_float)m_ep.yaw, (VWB_float)m_ep.roll ).Transposed() : VWB_MAT44f::RLHT( (VWB_float)m_ep.pitch, (VWB_float)m_ep.yaw, (VWB_float)m_ep.roll );
-		
-		// rotate eye offset in respect to pivot
-		VWB_VEC3f eR = VWB_VEC3f::ptr(this->eye) * R;
-		// add to platform position
-		e+= eR; // this is the actual eyepoint
-		e = e * m_mViewIG; // translate to local coordinates
 
-		VWB_MAT44f T = VWB_MAT44f::TT( -e.x, -e.y, -e.z );
-	
-		m_mVP = m_mBaseI * m_mViewIG * T;
+		// add eye offset rotated to platform
+		if( 0 != this->eye[0] || 0 != this->eye[1] || 0 != this->eye[2] )
+			e += VWB_VEC3f::ptr( this->eye ) * R;
+
+		// translate to local coordinates
+		e = e * m_mViewIG;
+
+		VWB_MAT44f T = VWB_MAT44f::TT( -e );
+		m_mVP = m_mBaseI * m_mViewIG * T; //TODO precalc
 
 		if( bTurnWithView )
-		{
-			// we have to rotate around pivot
-			V = VWB_MAT44f::TT( this->eye[0], this->eye[1], this->eye[2] ) * R * VWB_MAT44f::TT( -this->eye[0], -this->eye[1], -this->eye[2] ) * m_mViewIG;
-			//V = R * m_mViewIG;
-		}
+			V = R * m_mViewIG;
 		else
 			V = m_mViewIG * T;
 
-		if( m_bRH )
-			P =  VWB_MAT44f::PRHT( m_viewSizes, nearDist, farDist, screenDist, e );
-		else
-			P =  VWB_MAT44f::PLHT( m_viewSizes, nearDist, farDist, screenDist, e );
+		VWB_float clip[6];
+		getClip( e, clip );
 
-		m_mVP*= P;
+		if( m_bRH )
+			P = VWB_MAT44f::PRHT( m_viewSizes, nearDist, farDist, screenDist, e );
+		else
+			P = VWB_MAT44f::PLHT( m_viewSizes, nearDist, farDist, screenDist, e );
+
+		m_mVP *= P;
 
 		if( pView )
 		{
@@ -1413,6 +1576,60 @@ VWB_ERROR Dummywarper::GetViewProjection( VWB_float* eye, VWB_float* rot, VWB_fl
 		if( pProj )
 		{
 			P.SetPtr( pProj );
+		}
+	}
+	return ret;
+}
+
+VWB_ERROR Dummywarper::GetViewClip( VWB_float* eye, VWB_float* rot, VWB_float* pView, VWB_float* pClip )
+{
+	VWB_ERROR ret = VWB_Warper_base::GetViewClip( eye, rot, pView, pClip );
+	if( VWB_ERROR_NONE == ret )
+	{
+		VWB_MAT44f V; // the view matrix to return 
+		VWB_MAT44f P; // the projection matrix to return 
+
+		// we transform the dynamic eye-point to the constant view:
+
+		// copy eye coordinate to e
+		VWB_VEC3f e( (float)m_ep.x, (float)m_ep.y, (float)m_ep.z );
+
+		// rotation matrix from angles
+		VWB_MAT44f R = m_bRH ? VWB_MAT44f::R( (VWB_float)m_ep.pitch, (VWB_float)m_ep.yaw, (VWB_float)m_ep.roll ).Transposed() : VWB_MAT44f::RLHT( (VWB_float)m_ep.pitch, (VWB_float)m_ep.yaw, (VWB_float)m_ep.roll );
+
+		// add eye offset rotated to platform
+		if( 0 != this->eye[0] || 0 != this->eye[1] || 0 != this->eye[2] )
+			e += VWB_VEC3f::ptr( this->eye ) * R;
+
+		// translate to local coordinates
+		e = e * m_mViewIG;
+
+		VWB_MAT44f T = VWB_MAT44f::TT( -e );
+		m_mVP = m_mBaseI * m_mViewIG * T; //TODO precalc
+
+		if( bTurnWithView )
+			V = R * m_mViewIG;
+		else
+			V = m_mViewIG * T;
+
+		VWB_float clip[6];
+		getClip( e, clip );
+
+		if( m_bRH )
+			P = VWB_MAT44f::PRHT( m_viewSizes, nearDist, farDist, screenDist, e );
+		else
+			P = VWB_MAT44f::PLHT( m_viewSizes, nearDist, farDist, screenDist, e );
+
+		m_mVP *= P;
+
+		if( pView )
+		{
+			V.SetPtr( pView );
+		}
+
+		if( pClip )
+		{
+			memcpy( pClip, clip, sizeof( clip ) );
 		}
 	}
 	return ret;
@@ -2624,6 +2841,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,LPVOID lpReserv
 	{
 		case DLL_PROCESS_ATTACH:
 			g_hModDll = hModule;
+			//g_logLevel = 2;
+			//strcpy_s( g_logFilePath, "VWB.log" );
+			//logStr( 2, "bla" );
 			break;
 		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:

@@ -242,7 +242,8 @@ VWB_ERROR DX10WarpBlend::Init( VWB_WarpBlendSet& wbs )
 #endif
 		ID3DBlob* pPSBlob = NULL;
 		SAFERELEASE( pErrBlob );
-		hr = D3DCompile( s_pixelShaderDX4, sizeof(s_pixelShaderDX4), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
+		hr = D3DCompile( s_pixelShaderDX4, sizeof( s_pixelShaderDX4 ), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
+//		hr = D3DCompile( s_pixelShaderDX4_vFlip, sizeof( s_pixelShaderDX4 ), NULL, NULL, NULL, pixelShader.c_str(), "ps_4_0", 0, 0, &pPSBlob, &pErrBlob );
 		if( FAILED( hr ) )
 		{
 			logStr( 0, "ERROR: The pixel shader code cannot be compiled (%08X): %s\n", hr, pErrBlob->GetBufferPointer() );
@@ -312,7 +313,8 @@ VWB_ERROR DX10WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 	m_device->OMGetRenderTargets( 1, &pRTV, &pDSV );
 
 	// do backbuffer copy if necessary
-	if( NULL == inputTexture )
+	if( NULL == inputTexture ||
+		VWB_UNDEFINED_GL_TEXTURE == inputTexture )
 	{
 		if( pRTV )
 		{
@@ -459,13 +461,6 @@ VWB_ERROR DX10WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 ////////////// set state
 	UINT stride = sizeof( SimpleVertex );
     UINT offset = 0;
-    m_device->IASetVertexBuffers( 0, 1, &m_VertexBuffer, &stride, &offset );
-	m_device->IASetInputLayout( m_Layout );
-    m_device->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	m_device->VSSetShader( m_VertexShader );
-
-	m_device->RSSetState( m_RasterState );
 
 	ConstantBuffer cb;
 	memcpy( cb.matView, m_mVP.Transposed(), sizeof( cb.matView ) );
@@ -489,8 +484,17 @@ VWB_ERROR DX10WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 		cb.offsScale[2] = 1.0f;
 		cb.offsScale[3] = 1.0f;
 	}
-	m_device->PSSetShader( m_PixelShader );
 	m_device->UpdateSubresource( m_ConstantBuffer, 0, NULL, &cb, 0, 0 );
+
+	m_device->IASetVertexBuffers( 0, 1, &m_VertexBuffer, &stride, &offset );
+	m_device->IASetInputLayout( m_Layout );
+	m_device->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	m_device->VSSetShader( m_VertexShader );
+	m_device->VSSetConstantBuffers( 0, 1, &m_ConstantBuffer );
+
+	m_device->RSSetState( m_RasterState );
+	m_device->PSSetShader( m_PixelShader );
 	m_device->PSSetConstantBuffers( 0, 1, &m_ConstantBuffer );
 	m_device->PSSetShaderResources( 0, 1, &m_texBB );
 	m_device->PSSetShaderResources( 1, 1, &m_texWarp );

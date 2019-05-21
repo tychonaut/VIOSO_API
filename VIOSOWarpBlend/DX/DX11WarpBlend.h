@@ -29,6 +29,9 @@ protected:
 	ID3D11RasterizerState*		m_RasterState;
 	ID3D11InputLayout*			m_Layout;
 
+	// render states
+	ID3D11DepthStencilState*	m_DepthState;
+	ID3D11BlendState*			m_BlendState;
 public:
 	///< the constructor
 	DX11WarpBlend( ID3D11Device* pDevice );

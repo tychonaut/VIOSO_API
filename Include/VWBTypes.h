@@ -21,6 +21,7 @@ typedef uint64_t VWB_ull; /// a 64bit unsigned integer
 typedef float VWB_float;	/// a single precision floating point number
 typedef double VWB_double;	/// a double precision floating point number
 
+#pragma pack( push, 4 )
 typedef struct VWB_size { VWB_int cx, cy; } VWB_size; /// a size
 typedef struct VWB_rect { VWB_int left, top, right, bottom; } VWB_rect; /// a size
 
@@ -62,12 +63,9 @@ typedef enum VWB_STATEMASK
 	VWB_STATEMASK_DEFAULT = VWB_STATEMASK_VERTEX_BUFFER | VWB_STATEMASK_INPUT_LAYOUT | VWB_STATEMASK_PRIMITIVE_TOPOLOGY | VWB_STATEMASK_RASTERSTATE
 } VWB_STATEMASK;
 
-#define VWB_logString( level, str ) ( VWB__logString ? VWB__logString( level, str ) : VWB_ERROR_GENERIC )
-
 /** The warper
 * @remarks All changes you do before calling VWB_Init are considered
 */
-#pragma pack( push, 4 )
 struct VWB_Warper
 {
 	/// this is where this ini file is, this defaults to ""
@@ -161,16 +159,19 @@ struct VWB_Warper
 	/// set to IPv4 address to listen on a specific one, defaults to "0.0.0.0", which means we listen to all local IPs
 	char		addr[MAX_PATH];
 
-	/// set to true to use OpenGL shader version 1.1 with fixed pipeline, defaults to 0
+	/// set to true to use OpenGL shader version 1.1 with fixed pipeline, defaults to false
 	bool		bUseGL110;
 
-	/// set to true if your input texture is only the optimal rect part
+	/// set to true if your input texture is only the optimal rect part, defaults to false
 	bool		bPartialInput;
 
 	/// Bitfield; only valid in Windows build
 	/// 1 rendering of mouse cursor
 	/// 2 disable system cursor over window 
 	VWB_int		mouseMode;
+
+	/// set to true to flip directX 11 texture v, defaults to false
+	bool		bFlipDXVs;
 };
 #pragma pack(pop)
 // ----------------------------------------------------------------------------------

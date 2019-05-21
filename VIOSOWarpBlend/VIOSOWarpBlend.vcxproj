@@ -1,12 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug Unity|Win32">
+      <Configuration>Debug Unity</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Unity|x64">
+      <Configuration>Debug Unity</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Unity|Win32">
+      <Configuration>Release Unity</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Unity|x64">
+      <Configuration>Release Unity</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="ReleaseTitan|Win32">
@@ -39,13 +55,32 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -66,6 +101,13 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -79,16 +121,28 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'" Label="PropertySheets">
@@ -99,14 +153,27 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)Assets\Plugins\</OutDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <OutDir>$(SolutionDir)Assets\Plugins\</OutDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -114,7 +181,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)64</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)Assets\Plugins\</OutDir>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">
@@ -139,6 +211,24 @@
       <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <ShowIncludes>false</ShowIncludes>
+      <MinimalRebuild>
+      </MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>
@@ -149,6 +239,24 @@
       <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild>
+      </MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,6 +284,31 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <MinimalRebuild>
+      </MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">
@@ -218,6 +351,29 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <MinimalRebuild>
+      </MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">
@@ -256,6 +412,7 @@
     <ClInclude Include="GL\GLext.h" />
     <ClInclude Include="GL\GLWarpBlend.h" />
     <ClInclude Include="GL\pixelshader.h" />
+    <ClInclude Include="JASONWrapper.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="mmath.h" />
     <ClInclude Include="Net.h" />
@@ -271,6 +428,18 @@
     <ClCompile Include="DX\DX9WarpBlend.cpp" />
     <ClCompile Include="DX\DXWarpBlend.cpp" />
     <ClCompile Include="GL\GLWarpBlend.cpp" />
+    <ClCompile Include="JASONWrapper.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="LoadDAE.cpp" />
     <ClCompile Include="LoadVWF.cpp" />
     <ClCompile Include="logging.cpp" />
@@ -287,6 +456,26 @@
     <CustomBuild Include="resource.h.subrev">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! subversion tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
 IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
@@ -346,7 +535,47 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! subversion tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! subversion tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
 IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
@@ -406,12 +635,36 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! subversion tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">resource.h</Outputs>
     </CustomBuild>
     <None Include="version.rc2" />
   </ItemGroup>

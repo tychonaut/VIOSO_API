@@ -1,8 +1,9 @@
 // ############################### //
 // ## VIOSO Warp and Blend dll  ## //
-// ## for DirectX9 + OpenGL     ## //
+// ## for DirectX + OpenGL      ## //
 // ## author:  Juergen Krahmann ## //
-// ## date:    2017/05/17       ## //
+// ## version: 1.3.0            ## //
+// ## date:    2019/03/07       ## //
 // ## Use with Calibrator >=4.3 ## //
 // ## Copyright VIOSO GmbH 2015 ## //
 // ############################### //
@@ -107,7 +108,6 @@ calibAdapterOrdinal=1				; display ordinal the number in i.e. "D4 UHDPROJ (VVM 3
 eyePointProvider=EyePointProvider	; a eye point provider dll name; the name is passed to LoadLibrary, so a full qualified path is possible, use quotes if white spaces
 eyePointProviderParam=				; string used to initialize provider, this depends on the implmementation
 mouseMode=0							; bitfield, set 1 to render current mouse cursor on top of warped buffer
-
 ;[channel 2] next channel, if you are using this .ini for more than one channel
 */
 
@@ -147,8 +147,9 @@ mouseMode=0							; bitfield, set 1 to render current mouse cursor on top of war
     * @param [IN,OUT,OPT]	pEye	sets the new eye position, if a eye point provider is present, the value is getted from there, pEye is updated
     * @param [IN,OUT,OPT]	pRot	the new rotation in radian, if a eye point provider is present, the value is getted from there, pRot is updated
     * @param [OUT]			pView	it gets the updated view matrix to translate and rotate into the viewer's perspective
-    * @param [OUT]			pProj	it gets the updated projection matrix
-    * @return VWB_ERROR_NONE on success, VWB_ERROR_GENERIC otherwise 
+	* @param [OUT]			pProj	it gets the updated projection matrix
+	* @param [OUT]			pClip	it gets the updated clip planes, left, top, right, bottom, near, far
+    * @return VWB_ERROR_NONE on success, VWB_ERROR_GENERIC otherwise
 	* @remarks If EyePointProvider is used, the eye point is set by calling it's getEye function. eye and rot are set to that if not NULL.
 	* Else, if eye and rot are not NULL, values taken from here.
 	* Else the eye and rot are set to 0-vectors.
@@ -191,7 +192,8 @@ mouseMode=0							; bitfield, set 1 to render current mouse cursor on top of war
 		return a;
 	}
 */
-	VIOSOWARPBLEND_API( VWB_ERROR, VWB_getViewProj, ( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot, VWB_float* pView, VWB_float* pProj));
+	VIOSOWARPBLEND_API( VWB_ERROR, VWB_getViewProj, ( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot, VWB_float* pView, VWB_float* pProj ) );
+	VIOSOWARPBLEND_API( VWB_ERROR, VWB_getViewClip, ( VWB_Warper* pWarper, VWB_float* pEye, VWB_float* pRot, VWB_float* pView, VWB_float* pClip ) );
 
     /** set the view and projection matrix directly
 	* @param [IN]			pWarper	a valid warper
@@ -231,7 +233,7 @@ mouseMode=0							; bitfield, set 1 to render current mouse cursor on top of war
 
 #if defined( WIN32 ) && defined( VWB_USE_DEPRECATED_INIT )
 //////////////////// deprecated WIN32 functions ////////////////////////
-typedef VWB_Warper* VWB_DX9WHANDLE; /// (deprecated) a warper handle do
+typedef VWB_Warper* VWB_DX9WHANDLE; /// (dep recated) a warper handle do
 // forward declarations only, your project needs to include d3d9.h and d3d9x.h
 typedef struct IDirect3DDevice9 *LPDIRECT3DDEVICE9;
 typedef struct IDirect3DTexture9 *LPDIRECT3DTEXTURE9;

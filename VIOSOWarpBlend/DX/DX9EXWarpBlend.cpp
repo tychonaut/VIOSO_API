@@ -183,7 +183,8 @@ VWB_ERROR DX9EXWarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 
 	LPDIRECT3DTEXTURE9 pSrc;
 	// do backbuffer copy if necessary
-	if( NULL == inputTexture )
+	if( NULL == inputTexture ||
+		VWB_UNDEFINED_GL_TEXTURE == inputTexture )
 	{
 		LPDIRECT3DSURFACE9 srfBB = NULL;
 		if( SUCCEEDED( m_device->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &srfBB ) ) )

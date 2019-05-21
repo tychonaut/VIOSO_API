@@ -52,7 +52,8 @@ GLchar const* s_fragment_shader_header_v110 =
 "uniform bool bDoNotBlend;												\n"
 "uniform mat4 matView;													\n"
 "#define texcoord gl_TexCoord[0]										\n"
-"#define FragColor gl_FragColor											\n";
+"#define FragColor gl_FragColor											\n"
+"vec4 _tex2D( sampler2D sam, vec2 tex ){ return texture2D( sam, tex ); } \n";
 
 GLchar const* s_fragment_shader_header_v330 =
 "#version 330															\n"
@@ -61,7 +62,8 @@ GLchar const* s_fragment_shader_header_v330 =
 "uniform bool bDoNotBlend;												\n"
 "uniform mat4 matView;													\n"
 "in vec2 texcoord;														\n"
-"out vec4 FragColor;													\n";
+"out vec4 FragColor;													\n"
+"vec4 _tex2D( sampler2D sam, vec2 tex ){ return texture( sam, tex ); }   \n";
 
 GLchar const* s_func_tex2D_BC = 
 "uniform vec4 params;													\n"
@@ -91,17 +93,17 @@ GLchar const* s_func_tex2D_BC =
 "	t1*= params.zw;														\n"
 "																		\n"
 "	return																\n"
-"		( texture2D( texCnt, t0 ) * s0.x +								\n"
-"		  texture2D( texCnt, vec2( t1.x, t0.y ) ) * s1.x ) * s0.y +		\n"
-"		( texture2D( texCnt, vec2( t0.x, t1.y ) ) * s0.x +				\n"
-"		  texture2D( texCnt, t1 ) * s1.x ) * s1.y;						\n"
+"		( _tex2D( texCnt, t0 ) * s0.x +								\n"
+"		  _tex2D( texCnt, vec2( t1.x, t0.y ) ) * s1.x ) * s0.y +		\n"
+"		( _tex2D( texCnt, vec2( t0.x, t1.y ) ) * s0.x +				\n"
+"		  _tex2D( texCnt, t1 ) * s1.x ) * s1.y;						\n"
 "}																		\n";
 
 GLchar const* s_func_tex2D = 
 "vec4 _texture2D( sampler2D texCnt,										\n"
 "				   vec2 vPos)											\n"
 "{																		\n"
-"	return texture2D( texCnt, vPos );									\n"
+"	return _tex2D( texCnt, vPos );									\n"
 "}																		\n";
 
 GLchar const* s_bypass_fragment_shader = 
@@ -114,8 +116,8 @@ GLchar const* s_bypass_fragment_shader =
 GLchar const* s_warp_blend_fragment_shader = 
 "void main()\n"
 "{																		\n"
-"	vec4 tex = texture2D( samWarp,texcoord.st );						\n"
-"	vec4 blend = texture2D( samBlend, texcoord.st );					\n"
+"	vec4 tex = _tex2D( samWarp,texcoord.st );						\n"
+"	vec4 blend = _tex2D( samBlend, texcoord.st );					\n"
 "	if( 0.1 < tex.z )													\n"
 "	{																	\n"
 "		tex.y = 1.0 - tex.y;											\n"
@@ -137,12 +139,12 @@ GLchar const* s_warp_blend_fragment_shader =
 "		FragColor = vec4( 0.0,0.0,0.0,1.0 );							\n"
 "	}																	\n"
 "}																		\n";
-																		
+                                                                        
 GLchar const* s_warp_blend_fragment_shader_3D = 						
 "void main()															\n"
 "{                                               						\n"
-"	vec4 tex = texture2D( samWarp, texcoord.st );     					\n"
-"	vec4 blend = texture2D( samBlend, texcoord.st );  					\n"
+"	vec4 tex = _tex2D( samWarp, texcoord.st );     					\n"
+"	vec4 blend = _tex2D( samBlend, texcoord.st );  					\n"
 "	if( 0.1 < tex.w )                            						\n"
 "	{                                           						\n"
 "		tex/= tex.w;                            						\n"
