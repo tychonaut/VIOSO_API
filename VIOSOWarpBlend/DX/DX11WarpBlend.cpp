@@ -115,7 +115,6 @@ bool SaveTex( LPCSTR path, ID3D11Device* dev, ID3D11DeviceContext* dc, ID3D11Tex
 					logStr( 3, "Could not write file %s", path );
 				}
 			}
-			/*
 			else if( DXGI_FORMAT_R16G16B16A16_TYPELESS == desc.Format ||
 					 DXGI_FORMAT_R16G16B16A16_UNORM == desc.Format ||
 					 DXGI_FORMAT_R16G16B16A16_UINT == desc.Format ||
@@ -129,7 +128,7 @@ bool SaveTex( LPCSTR path, ID3D11Device* dev, ID3D11DeviceContext* dc, ID3D11Tex
 				hdr.biHeight = -LONG( desc.Height );
 				hdr.biPlanes = 1;
 				hdr.biBitCount = 32;
-				hdr.biSizeImage = res.RowPitch * desc.Height;
+				hdr.biSizeImage = desc.Width * 4 * desc.Height;
 
 				BITMAPFILEHEADER fh = { 0 };
 				fh.bfType = 'MB';
@@ -138,21 +137,19 @@ bool SaveTex( LPCSTR path, ID3D11Device* dev, ID3D11DeviceContext* dc, ID3D11Tex
 
 				// swivel RGBA to BGRA
 				unsigned char t = 0;
-				unsigned char* pDst = new unsigned char[hdr.biSize];
+				unsigned char* pDst = new unsigned char[hdr.biSizeImage];
 				unsigned char* pxD = pDst;
-				int padd = res.RowPitch / sizeof( unsigned short ) - 4 * desc.Width;
-				for( unsigned short* pxS = (unsigned short*)res.pData, *pxE = ( (unsigned short*)res.pData ) + hdr.biSizeImage;
-					 pxS != pxE; pxS+= padd )
+				for( UINT y = 0; y != desc.Height; y++ )
 				{
-					for( const unsigned short* pxLE = pxS + (res.RowPitch / sizeof( unsigned short )); pxS != pxLE; pxS += 4, pxD+= 4 )
+					unsigned short* pxS = (unsigned short*)( ((unsigned char*)res.pData) + y * res.RowPitch );
+					for( const unsigned short* pxLE = pxS + desc.Width * 4; pxS != pxLE; pxS += 4, pxD += 4 )
 					{
-						pxD[0] = unsigned short( pxS[1] >> 8 );
-						pxD[1] = unsigned short( pxS[2] >> 8 );
-						pxD[2] = unsigned short( pxS[0] >> 8 );
-						pxD[3] = unsigned short( pxS[3] >> 8 );
+						pxD[0] = unsigned char( pxS[1] >> 8 );
+						pxD[1] = unsigned char( pxS[2] >> 8 );
+						pxD[2] = unsigned char( pxS[0] >> 8 );
+						pxD[3] = unsigned char( pxS[3] >> 8 );
 					}
 				}
-
 
 				FILE* f = NULL;
 				if( NO_ERROR == fopen_s( &f, path, "wb" ) )
@@ -168,7 +165,9 @@ bool SaveTex( LPCSTR path, ID3D11Device* dev, ID3D11DeviceContext* dc, ID3D11Tex
 				{
 					logStr( 3, "Could not write file %s", path );
 				}
-			} */
+
+				delete[] pDst;
+			}
 			else
 			{
 				logStr( 3, "Could not dump texture unknown format %i.", desc.Format );
@@ -637,6 +636,10 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 					if( SUCCEEDED( res ) )
 					{
 						D3D11_SHADER_RESOURCE_VIEW_DESC descSRV;
+						if( DXGI_FORMAT_R16G16B16A16_TYPELESS == desc.Format )
+							desc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
+						else if( DXGI_FORMAT_R8G8B8A8_TYPELESS == desc.Format )
+							desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 						descSRV.Format = desc.Format;
 						descSRV.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 						descSRV.Texture2D.MipLevels= 1;
@@ -717,10 +720,17 @@ VWB_ERROR DX11WarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 			D3D11_TEXTURE2D_DESC descTex;
 			pTexIn->GetDesc( &descTex );
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			if( DXGI_FORMAT_R16G16B16A16_TYPELESS == descTex.Format )
+			if( DXGI_FORMAT_R8G8B8A8_TYPELESS == descTex.Format )
 			{
-				desc.Format = DXGI_FORMAT_R16G16B16A16_UINT;
-
+				desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
+			else if( DXGI_FORMAT_R16G16B16A16_TYPELESS == descTex.Format )
+			{
+				desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			}
+			else if( DXGI_FORMAT_R32G32B32A32_TYPELESS == descTex.Format )
+			{
+				desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			}
 			else
 			{
