@@ -405,6 +405,7 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="DX\DX10WarpBlend.h" />
     <ClInclude Include="DX\DX11WarpBlend.h" />
+    <ClInclude Include="DX\DX12WarpBlend.h" />
     <ClInclude Include="DX\DX9EXWarpBlend.h" />
     <ClInclude Include="DX\DX9WarpBlend.h" />
     <ClInclude Include="DX\DXWarpBlend.h" />
@@ -424,6 +425,7 @@
   <ItemGroup>
     <ClCompile Include="DX\DX10WarpBlend.cpp" />
     <ClCompile Include="DX\DX11WarpBlend.cpp" />
+    <ClCompile Include="DX\DX12WarpBlend.cpp" />
     <ClCompile Include="DX\DX9EXWarpBlend.cpp" />
     <ClCompile Include="DX\DX9WarpBlend.cpp" />
     <ClCompile Include="DX\DXWarpBlend.cpp" />

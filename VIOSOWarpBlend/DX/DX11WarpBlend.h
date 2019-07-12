@@ -52,8 +52,4 @@ public:
 	//VWB_ERROR DX9WarpBlend::setModel( D3DXMATRIX* pModelView, LPCSTR path, int nBlendChannels, DX9WarpBlend* pBlendChannels );
 
     virtual VWB_ERROR Render( VWB_param inputTexture, VWB_uint stateMask );  
-
-protected:
-	// Helper functions
-    void                SetTexture(unsigned int texId, ID3D11ShaderResourceView* tex) const;
 };

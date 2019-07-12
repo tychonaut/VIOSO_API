@@ -84,6 +84,9 @@
     <ClInclude Include="JASONWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX\DX12WarpBlend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX\DX9WarpBlend.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JASONWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX\DX12WarpBlend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

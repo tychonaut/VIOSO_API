@@ -2,6 +2,7 @@
 #include "DX/DX9WarpBlend.h"
 #include "DX/DX9EXWarpBlend.h"
 #include "DX/DX11WarpBlend.h"
+#include "DX/DX12WarpBlend.h"
 #include "DX/DX10WarpBlend.h"
 #include "Net.h"
 #pragma comment( lib, "shlwapi" )
@@ -263,62 +264,72 @@ VWB_ERROR VWB_CreateA( void* pDxDevice, char const* szConfigFile, char const* sz
 		else if(pDxDevice)
 		{
 			IUnknown* pUK = (IUnknown*)pDxDevice;
-			if (pUK)
+			if( pUK )
 			{
 				IUnknown* pUK2 = NULL;
 				// destinguish between DX flavours
 				do {
-					if (SUCCEEDED(pUK->QueryInterface(__uuidof(ID3D11Device), (void**)&pUK2)))
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( ID3D12CommandQueue ), (void**)&pUK2 ) ) )
 					{
 						pUK2->Release();
-						if (pUK == pUK2)
+						if( pUK == pUK2 )
 						{
-							*ppWarper = new DX11WarpBlend((ID3D11Device*)pDxDevice);
+							*ppWarper = new DX12WarpBlend( (ID3D12CommandQueue*)pDxDevice );
 							break;
 						}
 					}
 
-					if (SUCCEEDED(pUK->QueryInterface(__uuidof(ID3D10Device1), (void**)&pUK2)))
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( ID3D11Device ), (void**)&pUK2 ) ) )
 					{
 						pUK2->Release();
-						if (pUK == pUK2)
+						if( pUK == pUK2 )
 						{
-							*ppWarper = new DX10WarpBlend((ID3D10Device*)pDxDevice);
+							*ppWarper = new DX11WarpBlend( (ID3D11Device*)pDxDevice );
 							break;
 						}
 					}
 
-					if (SUCCEEDED(pUK->QueryInterface(__uuidof(ID3D10Device), (void**)&pUK2)))
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( ID3D10Device1 ), (void**)&pUK2 ) ) )
 					{
 						pUK2->Release();
-						if (pUK == pUK2)
+						if( pUK == pUK2 )
 						{
-							*ppWarper = new DX10WarpBlend((ID3D10Device*)pDxDevice);
+							*ppWarper = new DX10WarpBlend( (ID3D10Device*)pDxDevice );
 							break;
 						}
 					}
 
-					if (SUCCEEDED(pUK->QueryInterface(__uuidof(IDirect3DDevice9Ex), (void**)&pUK2)))
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( ID3D10Device ), (void**)&pUK2 ) ) )
 					{
 						pUK2->Release();
-						if (pUK == pUK2)
+						if( pUK == pUK2 )
 						{
-							*ppWarper = new DX9EXWarpBlend((LPDIRECT3DDEVICE9EX)pDxDevice);
+							*ppWarper = new DX10WarpBlend( (ID3D10Device*)pDxDevice );
 							break;
 						}
 					}
 
-					if (SUCCEEDED(pUK->QueryInterface(__uuidof(IDirect3DDevice9), (void**)&pUK2)))
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( IDirect3DDevice9Ex ), (void**)&pUK2 ) ) )
 					{
 						pUK2->Release();
-						if (pUK == pUK2)
+						if( pUK == pUK2 )
 						{
-							*ppWarper = new DX9WarpBlend((LPDIRECT3DDEVICE9)pDxDevice);
+							*ppWarper = new DX9EXWarpBlend( (LPDIRECT3DDEVICE9EX)pDxDevice );
 							break;
 						}
 					}
 
-				} while (0);
+					if( SUCCEEDED( pUK->QueryInterface( __uuidof( IDirect3DDevice9 ), (void**)&pUK2 ) ) )
+					{
+						pUK2->Release();
+						if( pUK == pUK2 )
+						{
+							*ppWarper = new DX9WarpBlend( (LPDIRECT3DDEVICE9)pDxDevice );
+							break;
+						}
+					}
+
+				} while( 0 );
 			}
 		}
 		else

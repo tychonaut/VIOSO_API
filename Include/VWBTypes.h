@@ -567,6 +567,24 @@ typedef struct VWB_WarpBlendMesh
 	VWB_size dim;
 }VWB_WarpBlendMesh;
 
+//#ifdef WIN32
+//typedef struct VWB_D3D12Helper
+//{
+//	typedef UINT64( __stdcall *pfn_getfenceValue )( );
+//
+//	VWB_uint sig;
+//	VWB_uint reserved;
+//	void* pDxDevice;
+//	void* pDxCommandQueue;
+//	const static VWB_uint _sig = 'DX12';
+//	VWB_D3D12Helper( void* _pDxDevice, void* _pDxCommandQueue )
+//		: sig( _sig )
+//		, reserved( 0 )
+//		, pDxDevice( _pDxDevice )
+//		, pDxCommandQueue( _pDxCommandQueue )
+//	{}
+//} VWB_D3D12Helper;
+//#endif //def WIN32
 #pragma pack(pop)
 
 

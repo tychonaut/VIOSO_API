@@ -1,8 +1,4 @@
-VIOSO Warp and Blend API
-(c) 2017-2019 VIOSO GmbH
-Jürgen Krahmann
-
-This library is meant to use in image generators, to do warping and blending. It takes a .vwf export and a texture buffer 
+﻿This library is meant to use in image generators, to do warping and blending. It takes a .vwf export and a texture buffer 
 to sample from. If no texture buffer is given, it uses a copy of the current back buffer. It will render to the currently set back buffer.
 It provides image based warping, suitable for most cases and, if a 3D map is provided, dynamc eye warping.
 Usage: 
@@ -38,6 +34,7 @@ in module initialization, this loads function pointers from library
 Always make sure to have your platform headers loaded before!
 To access deprecated functions #define VWB_USE_DEPRECATED_INIT
 
+@Remarks
 To allocate a warper, call VWB_Create. A specified config file is read.
 You might edit all settings in warper struct. Then call VWB_Init.
 There is no logical maximum on the number of allocated warpers.
@@ -60,11 +57,11 @@ distance, where the screen will be (screen). These values come from a configurat
 Example .ini file (comments are actually not allowed there, remove them before use!!):
 ; this is where values for every channel go...
 [default]
-logLevel=1
+logLevel=1							;log level, 0 only fatal errors, 1 only errors and important info, 2 normal log, but guaranteed no info logging in render and frustum methods, 3 verbose debug log, defaults to 0
 logFile=VIOSOWarpBlend.log			;some other log file; it defaults to VIOSOWarpBlend.log, relative paths are relative to VIOSOWarpBlend.dll, not the main module!
-bLogClear=0							; if 1, clear the logfile on start, defaults to 0
-near=1.0							; the near plane 
-far=20000.0							; the far plane
+bLogClear=0							;if 1, clear the logfile on start, defaults to 0
+near=1.0							;the near plane 
+far=20000.0							;the far plane
 trans=[1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,1] ;this is the transformation matrix transforming a vioso coordinate to an IG coordinate this defines the pivot of a moving platform, column major format
 base=[1,0,0,0;0,1,0,0;0,0,-1,0;0,0,0,1] ;same as above, row major format DirectX conform, as DX uses left-handed coordinate system, z has to be inverted! 
 bTurnWithView=1						;set to 1 if view turnes and moves with eye, i.e view is obtained from a vehicle position on a moving platform, defaults to 0
@@ -77,24 +74,29 @@ splice=0							;bitfield:	0x00000001 change sign of pitch, 0x00000002 use input 
 									;0x00100000 change sign of y movement, 0x00200000 use input x as y, 0x00400000 use input z as y
 									;0x01000000 change sign of z movement, 0x02000000 use input x as z, 0x04000000 use input y as z
 bAutoView=0							;set to 1 to enable automatic view calculation, defaults to 0
+									;it will override dir=[], fov=[] and screen to use calculated values
 autoViewC=1							;moving range coefficient. defaults to 1, set a range in x,y,z from platform origin to be mapped; x+- autoViewC * screen / 2
-gamma=1.0							;set a gamma value. This is multiplied by the gamma already set while calibrating!, defaults to 1
+gamma=1.0							;set a gamma value. This is multiplied by the gamma already set while calibrating!, defaults to 1, if calibrators blend looks different than in your application, adjust this value!
 port=942							;set to a TCP IPv4 port, use 0 to disable network. defaults to 0, standard port is 942
 addr=0.0.0.0						;set to IPv4 address, to listen to specific adapter, set to 0.0.0.0 to listen on every adapter, defaults to 0.0.0.0
 bUseGL110=0							;set to 1, to use shader version 1.1 with fixed pipeline, defaults to 0
 bPartialInput						;set to 1, to input texture act as optimal rect part, defaults to 0
-
-[channel 1]
-eye=[0,0,0]							; this is the eye position relative to pivot
-dir=[0, -20, 0]						; this is the view direction, rotation angles around axis' [x,y,z]. The rotation order is yaw (y), pitch (x), roll (z); positive yaw turns right, positive pitch turns up and positive roll turns clockwise
-fov=[45,45,45,45]					; this is the fields of view, x - left, y - top, z - right, w - bottom
-screen=3650.000000					; the distance of the render plane from eye point
-calibFile=..\Res\Calib_150930_3.vwf ; path to warp blend file(s), if relative, it is relative to the VIOSOWarpBlend.dll, not the main module! To load more than .vwf/.bmp, separate with comma.
+eye=[0,0,0]							; this is the eye position relative to pivot, defaults to [0,0,0]
+dir=[0, 0, 0]						; this is the view direction, rotation angles around axis' [x,y,z]. The rotation order is yaw (y), pitch (x), roll (z); positive yaw turns right, positive pitch turns up and positive roll turns clockwise, defaults to [0,0,0]
+fov=[45,45,45,45]					; this is the fields of view, x - left, y - top, z - right, w - bottom, defaults to [30,20,30,20]
+screen=3.650000000					; the distance of the render plane from eye point.defaults to 1, watch the used units
+calibFile=..\Res\Calib_150930.vwf ; path to warp blend file(s), if relative, it is relative to the VIOSOWarpBlend.dll, not the main module! To load more than .vwf/.bmp, separate with comma.
 calibIndex=0						; index, in case there are more than one display calibrated; if index is omitted you can specify the display ordinal
 calibAdapterOrdinal=1				; display ordinal the number in i.e. "D4 UHDPROJ (VVM 398)" matches 4. In case no index is found index is set to 0
 eyePointProvider=EyePointProvider	; a eye point provider dll name; the name is passed to LoadLibrary, so a full qualified path is possible, use quotes if white spaces
 eyePointProviderParam=				; string used to initialize provider, this depends on the implmementation
 mouseMode=0							; bitfield, set 1 to render current mouse cursor on top of warped buffer
 
+[channel 1]
+eye=[0,0,0]
+dir=[0, -20, 0]
+fov=[45,25,45,25]
+screen=3.000000
+calibFile=..\Res\Calib_150930_1.vwf
+calibIndex=0
 ;[channel 2] next channel, if you are using this .ini for more than one channel
-*/
