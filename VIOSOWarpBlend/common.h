@@ -13,6 +13,7 @@
 #include <memory.h>
 #include <stdio.h>
 #include <map>
+#include <string>
 
 #define VWB_USE_DEPRECATED_INIT
 #include "../Include/VIOSOWarpBlend.h"

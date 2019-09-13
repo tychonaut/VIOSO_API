@@ -53,7 +53,8 @@ VWB_ERROR DX9EXWarpBlend::Init( VWB_WarpBlendSet& wbs )
 		D3DDEVICE_CREATION_PARAMETERS p = {0};
 
 		RECT rC = {0};
-		if( FAILED( m_device->GetCreationParameters( &p ) ) ||
+		if( FAILED( m_device->GetCreationParameters( &p ) ) || 
+			0 == p.hFocusWindow ||
 			!::GetClientRect( p.hFocusWindow, &rC ) )
 		{
 			logStr( 1, "WARNING: No window found, cannot set viewport.\n" );
@@ -70,48 +71,63 @@ VWB_ERROR DX9EXWarpBlend::Init( VWB_WarpBlendSet& wbs )
 			logStr( 2, "Window found. Viewport is %ux%u.\n", m_vp.Width, m_vp.Height );
 		}
 
-		LPDIRECT3DTEXTURE9 texTmp;
-		if (FAILED(m_device->CreateTexture(m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_SYSTEMMEM, &texTmp, NULL)) ||
-			FAILED(m_device->CreateTexture(m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_DEFAULT, &m_texBlend, NULL)) ||
-			FAILED(m_device->CreateTexture(m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_DEFAULT, &m_texWarp, NULL)))
+		LPDIRECT3DTEXTURE9 texTmpW = NULL;
+		LPDIRECT3DTEXTURE9 texTmpB = NULL;
+		if ( FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, 0 != ( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D ) ? D3DFMT_A32B32G32R32F : D3DFMT_G32R32F, D3DPOOL_SYSTEMMEM, &texTmpW, NULL ) ) ||
+			 FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A16B16G16R16, D3DPOOL_SYSTEMMEM, &texTmpB, NULL ) ) ||
+			 FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, 0 != ( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D ) ? D3DFMT_A32B32G32R32F : D3DFMT_G32R32F, D3DPOOL_DEFAULT, &m_texBlend, NULL ) ) ||
+			 FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A16B16G16R16, D3DPOOL_DEFAULT, &m_texWarp, NULL ) )  )
 		{
-			SAFERELEASE(texTmp);
+			SAFERELEASE( texTmpW );
+			SAFERELEASE( texTmpB );
 			logStr( 0, "ERROR: Failed to create lookup textures.\n" );
 			throw VWB_ERROR_SHADER;
 		}
 
         D3DLOCKED_RECT r;
-        if( FAILED(texTmp->LockRect( 0, &r, NULL, 0 ) ) )
+        if( FAILED(texTmpW->LockRect( 0, &r, NULL, 0 ) ) )
 		{
-			SAFERELEASE(texTmp);
+			SAFERELEASE(texTmpW);
 			logStr( 0, "ERROR: Failed to fill temp texture for blend.\n" );
 			throw VWB_ERROR_WARP;
 		}
-		memcpy( r.pBits, wb.pWarp, sizeof( *wb.pWarp ) * m_sizeMap.cx * m_sizeMap.cy );
-		texTmp->UnlockRect(0);
-		if(FAILED(m_device->UpdateTexture(texTmp, m_texWarp)))
+		if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D )
 		{
-			SAFERELEASE(texTmp);
+			memcpy( r.pBits, wb.pWarp, sizeof( *wb.pWarp ) * m_sizeMap.cx * m_sizeMap.cy );
+		}
+		else
+		{
+			for( float* d = (float*)r.pBits, *s = (float*)wb.pWarp, *sE = ( (float*)wb.pWarp ) + m_sizeMap.cx * m_sizeMap.cy; s != sE; d += 2, s += 4 )
+			{
+				d[0] = s[0];
+				d[1] = s[1];
+			}
+		}
+		texTmpW->UnlockRect(0);
+		if(FAILED(m_device->UpdateTexture(texTmpW, m_texWarp)))
+		{
+			SAFERELEASE(texTmpB);
 			logStr(0, "ERROR: Failed to update warp texture.\n");
 			throw VWB_ERROR_WARP;
 		}
 
-        if( FAILED(texTmp->LockRect( 0, &r, NULL, 0 ) ) )
+        if( FAILED(texTmpB->LockRect( 0, &r, NULL, 0 ) ) )
 		{
-			SAFERELEASE(texTmp);
+			SAFERELEASE(texTmpB);
 			logStr( 0, "ERROR: Failed to fill temp texture for blend.\n" );
 			throw VWB_ERROR_BLEND;
 		}
-		memcpy( r.pBits, wb.pBlend3, sizeof( *wb.pBlend3 ) * m_sizeMap.cx * m_sizeMap.cy );
-		texTmp->UnlockRect(0);
-		if(FAILED(m_device->UpdateTexture(texTmp, m_texBlend)))
+		memcpy( r.pBits, wb.pBlend2, sizeof( *wb.pBlend2 ) * m_sizeMap.cx * m_sizeMap.cy );
+		texTmpB->UnlockRect(0);
+		if(FAILED(m_device->UpdateTexture(texTmpB, m_texBlend)))
 		{
-			SAFERELEASE(texTmp);
+			SAFERELEASE(texTmpB);
 				logStr(0, "ERROR: Failed to update warp texture.\n");
 				throw VWB_ERROR_WARP;
 		}
 
-		SAFERELEASE(texTmp);
+		SAFERELEASE( texTmpW );
+		SAFERELEASE( texTmpB );
 		logStr(2, "INFO: Warp and blend lookup maps created.\n");
 
 

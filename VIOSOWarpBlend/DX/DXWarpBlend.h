@@ -2,8 +2,8 @@
 
 #include "../common.h"
 #include <D3Dcompiler.h>
-#include <DxErr.h>
-#include <d3dx9math.h>
+//#include <DxErr.h>
+#include "../3rdparty/d3dX/Include/d3dx9math.h"
 struct DXSCREENVERTEX
 {
 	D3DXVECTOR3 pos;

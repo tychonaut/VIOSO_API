@@ -4,7 +4,7 @@
 #include "Platform.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <float.h>
 #include "../Include/VWBTypes.h"
 
@@ -389,45 +389,45 @@ struct VWB_MATRIX
 	_inline_ static VWB_MATRIX T( VWB_VECTOR3<_T> const& t ) { VWB_MATRIX res( 1,0,0,t.x,0,1,0,t.y,0,0,1,t.z,0,0,0,1); return res;}
 	_inline_ static VWB_MATRIX T( _T x, _T y, _T z ) { VWB_MATRIX res( 1,0,0,x,0,1,0,y,0,0,1,z,0,0,0,1); return res;}
 
-	_inline_ static VWB_MATRIX Rx( _T x ) { return VWB_MATRIX( 1,0,0,0,  0,cos(x),-sin(x),0,  0,sin(x),cos(x),0, 0,0,0,1 ); }
-	_inline_ static VWB_MATRIX Ry( _T y ) { return VWB_MATRIX( cos(y),0,-sin(y),0,  0,1,0,0, sin(y),0,cos(y),0, 0,0,0,1 ); } 
-	_inline_ static VWB_MATRIX Rz( _T z ) { return VWB_MATRIX( cos(z),sin(z),0,0,  -sin(z),cos(z),0,0, 0,0,1,0, 0,0,0,1 ); }
+	_inline_ static VWB_MATRIX Rx( _T x ) { return VWB_MATRIX( 1,0,0,0,  0,std::cos(x),-std::sin(x),0,  0,std::sin(x),std::cos(x),0, 0,0,0,1 ); }
+	_inline_ static VWB_MATRIX Ry( _T y ) { return VWB_MATRIX( std::cos(y),0,-std::sin(y),0,  0,1,0,0, std::sin(y),0,std::cos(y),0, 0,0,0,1 ); } 
+	_inline_ static VWB_MATRIX Rz( _T z ) { return VWB_MATRIX( std::cos(z),std::sin(z),0,0,  -std::sin(z),std::cos(z),0,0, 0,0,1,0, 0,0,0,1 ); }
 	_inline_ static VWB_MATRIX R( _T x, _T y, _T z )  // this is Rz(z) * Rx(x) * Ry(y)
 	{ 
 		return VWB_MATRIX(
-			 cos(y)*cos(z)-sin(x)*sin(y)*sin(z),	cos(x)*sin(z),	-sin(x)*cos(y)*sin(z)-sin(y)*cos(z),0,
-			-sin(x)*sin(y)*cos(z)-cos(y)*sin(z),	 cos(x)*cos(z),	 sin(y)*sin(z)-sin(x)*cos(y)*cos(z),0,
-			 cos(x)*sin(y),							 sin(x),		cos(x)*cos(y),0, 0,0,0,1 );
+			 std::cos(y)*std::cos(z)-std::sin(x)*std::sin(y)*std::sin(z),	std::cos(x)*std::sin(z),	-std::sin(x)*std::cos(y)*std::sin(z)-std::sin(y)*std::cos(z),0,
+			-std::sin(x)*std::sin(y)*std::cos(z)-std::cos(y)*std::sin(z),	 std::cos(x)*std::cos(z),	 std::sin(y)*std::sin(z)-std::sin(x)*std::cos(y)*std::cos(z),0,
+			 std::cos(x)*std::sin(y),							 std::sin(x),		std::cos(x)*std::cos(y),0, 0,0,0,1 );
 	}
 	_inline_ static VWB_MATRIX R( VWB_VECTOR3<_T> r )  // this is Rz(z) * Rx(x) * Ry(y)
 	{ 
 		return VWB_MATRIX33<_T>(
-			 cos(r.y)*cos(r.z)-sin(r.x)*sin(r.y)*sin(r.z),	cos(r.x)*sin(r.z),	-sin(r.x)*cos(r.y)*sin(r.z)-sin(r.y)*cos(r.z),0,
-			-sin(r.x)*sin(r.y)*cos(r.z)-cos(r.y)*sin(r.z),	 cos(r.x)*cos(r.z),	sin(r.y)*sin(r.z)-sin(r.x)*cos(r.y)*cos(r.z),0,
-			 cos(r.x)*sin(r.y),							 sin(r.x),		cos(r.x)*cos(r.y),0, 0,0,0,1 );
+			 std::cos(r.y)*std::cos(r.z)-std::sin(r.x)*std::sin(r.y)*std::sin(r.z),	std::cos(r.x)*std::sin(r.z),	-std::sin(r.x)*std::cos(r.y)*std::sin(r.z)-std::sin(r.y)*std::cos(r.z),0,
+			-std::sin(r.x)*std::sin(r.y)*std::cos(r.z)-std::cos(r.y)*std::sin(r.z),	 std::cos(r.x)*std::cos(r.z),	std::sin(r.y)*std::sin(r.z)-std::sin(r.x)*std::cos(r.y)*std::cos(r.z),0,
+			 std::cos(r.x)*std::sin(r.y),							 std::sin(r.x),		std::cos(r.x)*std::cos(r.y),0, 0,0,0,1 );
 	}
 
 	// transposed ones
 	_inline_ static VWB_MATRIX TT( VWB_VECTOR3<_T> const& t ) { VWB_MATRIX res( 1,0,0,0,0,1,0,0,0,0,1,0,t.x,t.y,t.z,1); return res;}
 	_inline_ static VWB_MATRIX TT( _T x, _T y, _T z ) { VWB_MATRIX res( 1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1); return res;}
 	// transposed matrices
-	_inline_ static VWB_MATRIX RxLHT( _T x ) { return VWB_MATRIX( 1,0,0,0,  0,cos(x),sin(x),0,  0,-sin(x),cos(x),0, 0,0,0,1 ); }
-	_inline_ static VWB_MATRIX RyLHT( _T y ) { return VWB_MATRIX(cos(y),0,-sin(y),0,  0,1,0,0, sin(y),0,cos(y),0,  0,0,0,1 ); } 
-	_inline_ static VWB_MATRIX RzLHT( _T z ) { return VWB_MATRIX(cos(z),sin(z),0,0,  -sin(z),cos(z),0,0, 0,0,1,0,  0,0,0,1 ); }
+	_inline_ static VWB_MATRIX RxLHT( _T x ) { return VWB_MATRIX( 1,0,0,0,  0,std::cos(x),std::sin(x),0,  0,-std::sin(x),std::cos(x),0, 0,0,0,1 ); }
+	_inline_ static VWB_MATRIX RyLHT( _T y ) { return VWB_MATRIX(std::cos(y),0,-std::sin(y),0,  0,1,0,0, std::sin(y),0,std::cos(y),0,  0,0,0,1 ); } 
+	_inline_ static VWB_MATRIX RzLHT( _T z ) { return VWB_MATRIX(std::cos(z),std::sin(z),0,0,  -std::sin(z),std::cos(z),0,0, 0,0,1,0,  0,0,0,1 ); }
 	_inline_ static VWB_MATRIX RLHT( _T x, _T y, _T z ) // this is RyT(y) * RxT(x) * RzT(z)
 	{ 
 		return VWB_MATRIX( 
-			 cos(y)*cos(z)-sin(x)*sin(y)*sin(z),	-sin(x)*sin(y)*cos(z)-cos(y)*sin(z),	-cos(x)*sin(y), 0,
-			 cos(x)*sin(z),							cos(x)*cos(z),						 -sin(x), 0,
-			 sin(x)*cos(y)*sin(z)+sin(y)*cos(z),	-sin(y)*sin(z)+sin(x)*cos(y)*cos(z),	 cos(x)*cos(y), 0, 
+			 std::cos(y)*std::cos(z)-std::sin(x)*std::sin(y)*std::sin(z),	-std::sin(x)*std::sin(y)*std::cos(z)-std::cos(y)*std::sin(z),	-std::cos(x)*std::sin(y), 0,
+			 std::cos(x)*std::sin(z),							std::cos(x)*std::cos(z),						 -std::sin(x), 0,
+			 std::sin(x)*std::cos(y)*std::sin(z)+std::sin(y)*std::cos(z),	-std::sin(y)*std::sin(z)+std::sin(x)*std::cos(y)*std::cos(z),	 std::cos(x)*std::cos(y), 0, 
 			 0,0,0,1 );
 	}
 	_inline_ static VWB_MATRIX RLHT( VWB_VECTOR3<_T> r) // this is RyT(y) * RxT(x) * RzT(z)
 	{ 
 		return VWB_MATRIX( 
-			 cos(r.y)*cos(r.z)-sin(r.x)*sin(r.y)*sin(r.z),	-sin(r.x)*sin(r.y)*cos(r.z)-cos(r.y)*sin(r.z),	-cos(r.x)*sin(r.y),0,
-			 cos(r.x)*sin(r.z),							cos(r.x)*cos(r.z),						 -sin(r.x),0,
-			 sin(r.x)*cos(r.y)*sin(r.z)+sin(r.y)*cos(r.z),	-sin(r.y)*sin(r.z)+sin(r.x)*cos(r.y)*cos(r.z),	 cos(r.x)*cos(r.y),0,
+			 std::cos(r.y)*std::cos(r.z)-std::sin(r.x)*std::sin(r.y)*std::sin(r.z),	-std::sin(r.x)*std::sin(r.y)*std::cos(r.z)-std::cos(r.y)*std::sin(r.z),	-std::cos(r.x)*std::sin(r.y),0,
+			 std::cos(r.x)*std::sin(r.z),							std::cos(r.x)*std::cos(r.z),						 -std::sin(r.x),0,
+			 std::sin(r.x)*std::cos(r.y)*std::sin(r.z)+std::sin(r.y)*std::cos(r.z),	-std::sin(r.y)*std::sin(r.z)+std::sin(r.x)*std::cos(r.y)*std::cos(r.z),	 std::cos(r.x)*std::cos(r.y),0,
 			 0,0,0,1 );
 	}
 
@@ -956,41 +956,41 @@ struct VWB_MATRIX33
 	_inline_ static VWB_MATRIX33 O() { VWB_MATRIX33 res; memset( res, 0, sizeof( res ) ); return res;}
 	_inline_ static VWB_MATRIX33 S( VWB_VECTOR3<_T> const& scale) { return VWB_MATRIX33( scale.x, 0, 0,  0, scale.y, 0,  0, 0, scale.z );}
 	_inline_ static VWB_MATRIX33 S( _T const& sx, _T const& sy, _T const& sz ) { return VWB_MATRIX33( sx, 0, 0,  0, sy, 0,  0, 0, sz );}
-	_inline_ static VWB_MATRIX33 Rx( _T x ) { VWB_MATRIX33 res(1,0,0,  0,cos(x),-sin(x),  0,sin(x),cos(x) ); return res; }
-	_inline_ static VWB_MATRIX33 Ry( _T y ) { VWB_MATRIX33 res(cos(y),0,-sin(y),  0,1,0, sin(y),0,cos(y) ); return res; } 
-	_inline_ static VWB_MATRIX33 Rz( _T z ) { VWB_MATRIX33 res(cos(z),sin(z),0,  -sin(z),cos(z),0, 0,0,1 ); return res; }
+	_inline_ static VWB_MATRIX33 Rx( _T x ) { VWB_MATRIX33 res(1,0,0,  0,std::cos(x),-std::sin(x),  0,std::sin(x),std::cos(x) ); return res; }
+	_inline_ static VWB_MATRIX33 Ry( _T y ) { VWB_MATRIX33 res(std::cos(y),0,-std::sin(y),  0,1,0, std::sin(y),0,std::cos(y) ); return res; } 
+	_inline_ static VWB_MATRIX33 Rz( _T z ) { VWB_MATRIX33 res(std::cos(z),std::sin(z),0,  -std::sin(z),std::cos(z),0, 0,0,1 ); return res; }
 	_inline_ static VWB_MATRIX33 R( _T x, _T y, _T z )  // this is Rz(z) * Rx(x) * Ry(y)
 	{ 
 		return VWB_MATRIX33(
-			 cos(y)*cos(z)-sin(x)*sin(y)*sin(z),	cos(x)*sin(z),	-sin(x)*cos(y)*sin(z)-sin(y)*cos(z),
-			-sin(x)*sin(y)*cos(z)-cos(y)*sin(z),	 cos(x)*cos(z),	 sin(y)*sin(z)-sin(x)*cos(y)*cos(z),
-			 cos(x)*sin(y),							 sin(x),		cos(x)*cos(y)						);
+			 std::cos(y)*std::cos(z)-std::sin(x)*std::sin(y)*std::sin(z),	std::cos(x)*std::sin(z),	-std::sin(x)*std::cos(y)*std::sin(z)-std::sin(y)*std::cos(z),
+			-std::sin(x)*std::sin(y)*std::cos(z)-std::cos(y)*std::sin(z),	 std::cos(x)*std::cos(z),	 std::sin(y)*std::sin(z)-std::sin(x)*std::cos(y)*std::cos(z),
+			 std::cos(x)*std::sin(y),							 std::sin(x),		std::cos(x)*std::cos(y)						);
 	}
 	_inline_ static VWB_MATRIX33 R( VWB_VECTOR3<_T> r )  // this is Rz(z) * Rx(x) * Ry(y)
 	{ 
 		return VWB_MATRIX33(
-			 cos(r.y)*cos(r.z)-sin(r.x)*sin(r.y)*sin(r.z),	cos(r.x)*sin(r.z),	-sin(r.x)*cos(r.y)*sin(r.z)-sin(r.y)*cos(r.z),
-			-sin(r.x)*sin(r.y)*cos(r.z)-cos(r.y)*sin(r.z),	 cos(r.x)*cos(r.z),	sin(r.y)*sin(r.z)-sin(r.x)*cos(r.y)*cos(r.z),
-			 cos(r.x)*sin(r.y),							 sin(r.x),		cos(r.x)*cos(r.y)						);
+			 std::cos(r.y)*std::cos(r.z)-std::sin(r.x)*std::sin(r.y)*std::sin(r.z),	std::cos(r.x)*std::sin(r.z),	-std::sin(r.x)*std::cos(r.y)*std::sin(r.z)-std::sin(r.y)*std::cos(r.z),
+			-std::sin(r.x)*std::sin(r.y)*std::cos(r.z)-std::cos(r.y)*std::sin(r.z),	 std::cos(r.x)*std::cos(r.z),	std::sin(r.y)*std::sin(r.z)-std::sin(r.x)*std::cos(r.y)*std::cos(r.z),
+			 std::cos(r.x)*std::sin(r.y),							 std::sin(r.x),		std::cos(r.x)*std::cos(r.y)						);
 	}
 
 	// transposed matrices
-	_inline_ static VWB_MATRIX33 RxLHT( _T x ) { VWB_MATRIX33 res( 1,0,0,  0,cos(x),sin(x),  0,-sin(x),cos(x) ); return res; }
-	_inline_ static VWB_MATRIX33 RyLHT( _T y ) { VWB_MATRIX33 res(cos(y),0,-sin(y),  0,1,0, sin(y),0,cos(y) ); return res; } 
-	_inline_ static VWB_MATRIX33 RzLHT( _T z ) { VWB_MATRIX33 res(cos(z),sin(z),0,  -sin(z),cos(z),0, 0,0,1 ); return res; }
+	_inline_ static VWB_MATRIX33 RxLHT( _T x ) { VWB_MATRIX33 res( 1,0,0,  0,std::cos(x),std::sin(x),  0,-std::sin(x),std::cos(x) ); return res; }
+	_inline_ static VWB_MATRIX33 RyLHT( _T y ) { VWB_MATRIX33 res(std::cos(y),0,-std::sin(y),  0,1,0, std::sin(y),0,std::cos(y) ); return res; } 
+	_inline_ static VWB_MATRIX33 RzLHT( _T z ) { VWB_MATRIX33 res(std::cos(z),std::sin(z),0,  -std::sin(z),std::cos(z),0, 0,0,1 ); return res; }
 	_inline_ static VWB_MATRIX33 RLHT( _T x, _T y, _T z ) // this is RyT(y) * RxT(x) * RzT(z)
 	{ 
 		return VWB_MATRIX33( 
-			 cos(y)*cos(z)-sin(x)*sin(y)*sin(z),	-sin(x)*sin(y)*cos(z)-cos(y)*sin(z),	-cos(x)*sin(y),
-			 cos(x)*sin(z),							cos(x)*cos(z),						 -sin(x),
-			 sin(x)*cos(y)*sin(z)+sin(y)*cos(z),	-sin(y)*sin(z)+sin(x)*cos(y)*cos(z),	 cos(x)*cos(y) );
+			 std::cos(y)*std::cos(z)-std::sin(x)*std::sin(y)*std::sin(z),	-std::sin(x)*std::sin(y)*std::cos(z)-std::cos(y)*std::sin(z),	-std::cos(x)*std::sin(y),
+			 std::cos(x)*std::sin(z),							std::cos(x)*std::cos(z),						 -std::sin(x),
+			 std::sin(x)*std::cos(y)*std::sin(z)+std::sin(y)*std::cos(z),	-std::sin(y)*std::sin(z)+std::sin(x)*std::cos(y)*std::cos(z),	 std::cos(x)*std::cos(y) );
 	}
 	_inline_ static VWB_MATRIX33 RLHT( VWB_VECTOR3<_T> r) // this is RyT(y) * RxT(x) * RzT(z)
 	{ 
 		return VWB_MATRIX33( 
-			 cos(r.y)*cos(r.z)-sin(r.x)*sin(r.y)*sin(r.z),	-sin(r.x)*sin(r.y)*cos(r.z)-cos(r.y)*sin(r.z),	-cos(r.x)*sin(r.y),
-			 cos(r.x)*sin(r.z),							cos(r.x)*cos(r.z),						 -sin(r.x),
-			 sin(r.x)*cos(r.y)*sin(r.z)+sin(r.y)*cos(r.z),	-sin(r.y)*sin(r.z)+sin(r.x)*cos(r.y)*cos(r.z),	 cos(r.x)*cos(r.y) );
+			 std::cos(r.y)*std::cos(r.z)-std::sin(r.x)*std::sin(r.y)*std::sin(r.z),	-std::sin(r.x)*std::sin(r.y)*std::cos(r.z)-std::cos(r.y)*std::sin(r.z),	-std::cos(r.x)*std::sin(r.y),
+			 std::cos(r.x)*std::sin(r.z),							std::cos(r.x)*std::cos(r.z),						 -std::sin(r.x),
+			 std::sin(r.x)*std::cos(r.y)*std::sin(r.z)+std::sin(r.y)*std::cos(r.z),	-std::sin(r.y)*std::sin(r.z)+std::sin(r.x)*std::cos(r.y)*std::cos(r.z),	 std::cos(r.x)*std::cos(r.y) );
 	}
 
 	// give device x and y axis
@@ -1088,8 +1088,8 @@ struct VWB_MATRIX33
 	{
 		VWB_VECTOR3<_T> a; 
 		a.y = atan2( p[6], p[8] );
-		_T s = -sin( a.y );
-		_T c = cos( a.y );
+		_T s = -std::sin( a.y );
+		_T c = std::cos( a.y );
 		_T l = sqrt( p[6] * p[6] + p[8] * p[8] );
 		a.x = atan2( p[7], l );
 		a.z = -atan2( s * p[5] + c * p[3], s * p[2] + c * p[0] );
@@ -1106,8 +1106,8 @@ struct VWB_MATRIX33
 	{
 		VWB_VECTOR3<_T> a;
 		a.y = atan2( -p[2], p[8] );
-		_T s = sin( a.y );
-		_T c = cos( a.y );
+		_T s = std::sin( a.y );
+		_T c = std::cos( a.y );
 		_T l = sqrt( p[2] * p[2] + p[8] * p[8] );
 		a.x = -atan2( p[5], l );
 		a.z = -atan2( s * p[7] + c * p[1], s * p[6] + c * p[0] );

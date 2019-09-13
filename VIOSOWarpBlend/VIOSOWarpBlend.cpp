@@ -13,6 +13,8 @@
 #include "GL/GLWarpBlend.h"
 #include <locale.h>
 #include <time.h>
+#include <limits.h>
+#include <float.h>
 
 #ifdef WIN32
 #include <crtdbg.h>
@@ -23,6 +25,7 @@
 #include <limits.h>
 
 #include "logging.h"
+#include "3rdparty/delauney/DelaunayTriangles.h"
 
 VWB_size _size0 = { 0,0 };
 #ifdef WIN32
@@ -802,97 +805,118 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 	if( NULL == wb.pBlend )
 	{
 		logStr( 1, "WARNING: Blend texture missing. Creating...\n" );
-		wb.pBlend3 = new VWB_BlendRecord3[m_sizeMap.cx * m_sizeMap.cy];
-		for( VWB_BlendRecord3* p = wb.pBlend3, *pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++ )
+		wb.pBlend2 = new VWB_BlendRecord2[m_sizeMap.cx * m_sizeMap.cy];
+		for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++ )
 		{
-			p->r = 1.0f;
-			p->g = 1.0f;
-			p->b = 1.0f;
+			p->r = 65535;
+			p->g = 65535;
+			p->b = 65535;
 		}
-		wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV2;
-		wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
+		wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
+		wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV2;
 	}
 
-	// if gamma is set, apply gamma and promote blend to VWB_BlendRecord3
+	// regardless of the given format, prepare blend as U16 NORM
+	// if gamma is set, apply gamma and promote blend to VWB_BlendRecord2
 	if( 0.0f < gamma && 1.0f != gamma )
 	{
 		logStr( 1, "Adapting gamma by %.5f\n", gamma );
 		VWB_float g = 1.0f/gamma;
 		if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV3 )
 		{
-			for( VWB_BlendRecord3* p = wb.pBlend3, *pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++ )
+			VWB_BlendRecord2* pDst = new VWB_BlendRecord2[m_sizeMap.cx * m_sizeMap.cy];
+			VWB_BlendRecord2* pD = pDst;
+			for( VWB_BlendRecord3* p = wb.pBlend3, *pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
 			{
-				p->r = pow( p->r, g );
-				p->g = pow( p->g, g );
-				p->b = pow( p->b, g );
+				pD->r = VWB_word( pow( p->r, g ) * 65535.0f );
+				pD->g = VWB_word( pow( p->g, g ) * 65535.0f );
+				pD->b = VWB_word( pow( p->b, g ) * 65535.0f );
+				pD->a = VWB_word( p->a * 65535.0f );
 			}
+			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
+			wb.header.flags|= FLAG_SP_WARPFILE_HEADER_BLENDV2;
+			delete[] wb.pBlend3;
+			wb.pBlend2 = pDst;
 		}
 		else if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV2 )
 		{
-			VWB_BlendRecord3* pDst = new VWB_BlendRecord3[m_sizeMap.cx * m_sizeMap.cy];
-			VWB_BlendRecord3* pD = pDst;
-			for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
+			for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++ )
 			{
-				pD->r = pow( VWB_float(p->r) / 65535.0f, g );
-				pD->g = pow( VWB_float(p->g) / 65535.0f, g );
-				pD->b = pow( VWB_float(p->b) / 65535.0f, g );
-				pD->a = VWB_float(p->a) / 65535.0f;
+				p->r = VWB_word( pow( VWB_float( p->r ) / 65535.0f, g ) * 65535.0f );
+				p->g = VWB_word( pow( VWB_float( p->g ) / 65535.0f, g ) * 65535.0f );
+				p->b = VWB_word( pow( VWB_float( p->b ) / 65535.0f, g ) * 65535.0f );
+				// p->a stays untouched
 			}
-			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV2;
-			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
-			delete[] wb.pBlend2;
-			wb.pBlend3 = pDst;
 		}
 		else
 		{
-			VWB_BlendRecord3* pDst = new VWB_BlendRecord3[m_sizeMap.cx * m_sizeMap.cy];
-			VWB_BlendRecord3* pD = pDst;
+			VWB_BlendRecord2* pDst = new VWB_BlendRecord2[m_sizeMap.cx * m_sizeMap.cy];
+			VWB_BlendRecord2* pD = pDst;
 			for( VWB_BlendRecord* p = wb.pBlend, *pE = wb.pBlend + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
 			{
-				pD->r = pow( VWB_float(p->r) / 255.0f, g );
-				pD->g = pow( VWB_float(p->g) / 255.0f, g );
-				pD->b = pow( VWB_float(p->b) / 255.0f, g );
-				pD->a = VWB_float(p->a) / 255.0f;
+				pD->r = VWB_word( pow( VWB_float( p->r ) / 255.0f, g ) * 65535.0f );
+				pD->g = VWB_word( pow( VWB_float( p->g ) / 255.0f, g ) * 65535.0f );
+				pD->b = VWB_word( pow( VWB_float( p->b ) / 255.0f, g ) * 65535.0f );
+				pD->a = VWB_word( p->a ) * 255;
 			}
 			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
+			wb.header.flags|= FLAG_SP_WARPFILE_HEADER_BLENDV2;
 			delete[] wb.pBlend;
-			wb.pBlend3 = pDst;
+			wb.pBlend2 = pDst;
 		}
 	}
 	else if( !(wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV3) )
-	{ // promote to VWB_BlendRecord3 anyway...
-		if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV2 )
+	{ // change to VWB_BlendRecord2 anyway...
+		if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV3 )
 		{
-			VWB_BlendRecord3* pDst = new VWB_BlendRecord3[m_sizeMap.cx * m_sizeMap.cy];
-			VWB_BlendRecord3* pD = pDst;
-			for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
+			VWB_BlendRecord2* pDst = new VWB_BlendRecord2[m_sizeMap.cx * m_sizeMap.cy];
+			VWB_BlendRecord2* pD = pDst;
+			for( VWB_BlendRecord3* p = wb.pBlend3, *pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
 			{
-				pD->r = VWB_float(p->r) / 65535.0f;
-				pD->g = VWB_float(p->g) / 65535.0f;
-				pD->b = VWB_float(p->b) / 65535.0f;
-				pD->a = VWB_float(p->a) / 65535.0f;
+				pD->r = VWB_word( p->r * 65535.0f );
+				pD->g = VWB_word( p->g * 65535.0f );
+				pD->b = VWB_word( p->b * 65535.0f );
+				pD->a = VWB_word( p->a * 65535.0f );
 			}
-			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV2;
-			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
-			delete[] wb.pBlend2;
-			wb.pBlend3 = pDst;
+			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
+			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV2;
+			delete[] wb.pBlend3;
+			wb.pBlend2 = pDst;
 		}
 		else
 		{
-			VWB_BlendRecord3* pDst = new VWB_BlendRecord3[m_sizeMap.cx * m_sizeMap.cy];
-			VWB_BlendRecord3* pD = pDst;
+			VWB_BlendRecord2* pDst = new VWB_BlendRecord2[m_sizeMap.cx * m_sizeMap.cy];
+			VWB_BlendRecord2* pD = pDst;
 			for( VWB_BlendRecord* p = wb.pBlend, *pE = wb.pBlend + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pD++ )
 			{
-				pD->r = VWB_float(p->r) / 255.0f;
-				pD->g = VWB_float(p->g) / 255.0f;
-				pD->b = VWB_float(p->b) / 255.0f;
-				pD->a = VWB_float(p->a) / 255.0f;
+				pD->r = VWB_word( p->r * 255.0f );
+				pD->g = VWB_word( p->g * 255.0f );
+				pD->b = VWB_word( p->b * 255.0f );
+				pD->a = VWB_word( p->a * 255.0f );
 			}
-			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
+			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV2;
 			delete[] wb.pBlend;
-			wb.pBlend3 = pDst;
+			wb.pBlend2 = pDst;
 		}
 	}
+	// put clipping channel of warp to a channel of blend
+
+	VWB_WarpRecord* pW = wb.pWarp;
+	if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D )
+	{
+		for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pW++ )
+		{
+			p->a = pW->w;
+		}
+	}
+	else
+	{
+		for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pW++ )
+		{
+			p->a = pW->z;
+		}
+	}
+
 	if( 0 == ( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D ) )
 	{
 		// readjust bounds, init with opposite extremum
@@ -2439,6 +2463,7 @@ VWB_ERROR Dummywarper::getWarpMesh( VWB_int cols, VWB_int rows, VWB_WarpBlendMes
 			}
 			logStr( 2, "INFO: getWarpMesh: Triangulation succeeded. %u vertices with %u triangles.\n", mesh.nVtx, mesh.nIdx / 3 );
 
+#ifdef _DEBUG
 			for( VWB_uint i = 0; i != mesh.nIdx; i+= 3 )
 			{
 				VWB_WarpBlendVertex tri[3] = { mesh.vtx[mesh.idx[i]], mesh.vtx[mesh.idx[i+1]], mesh.vtx[mesh.idx[i+2]] };
@@ -2454,7 +2479,6 @@ VWB_ERROR Dummywarper::getWarpMesh( VWB_int cols, VWB_int rows, VWB_WarpBlendMes
 					int j = 0;
 				}
 			}
-#ifdef _DEBUG
 
 			struct sdm_vertex
 			{

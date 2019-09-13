@@ -7,6 +7,7 @@
 #include <queue>
 #include <list>
 #include <map>
+#include <string>
 
 #if defined( WIN32 ) || defined( WIN64 )
 
@@ -22,7 +23,7 @@
 	typedef long suseconds_t;
 	typedef int socklen_t;
 
-#define startSockets() 	WSADATA d = {0};WSAStartup(0x0002,&d)
+#define ifStartSockets() 	for( WSADATA d = {0}; 0 == d.wVersion && 0 == WSAStartup(0x0002,&d); )
 #define closeSockets WSACleanup
 
 #else /* WIN32 */
@@ -354,8 +355,8 @@ protected:
 	RecvQueue m_received;
 	int m_szRcvBuff;
 
-	UDPListener( UDPListener const& other ) : SockIn( other ) {}
-	UDPListener() : SockIn() {}
+	UDPListener( UDPListener const& other ) : SockIn( other ), m_szRcvBuff(0) {}
+	UDPListener() : SockIn(), m_szRcvBuff( 0 ) {}
 public:
 
 	DataPackage& front() { return m_received.front(); }
@@ -505,7 +506,7 @@ class Server
 {
 public:
 	typedef std::vector< SPtr<SockIn> > Listeners;
-	enum MODALSTATE { 
+	typedef enum MODALSTATE { 
 		MODALSTATE_RUN = -1025,
  		MODALSTATE_ERR = -2049,
 		MODALSTATE_EXC = -1535
@@ -521,7 +522,7 @@ public:
 	timeval m_sto;
 	Server();
 	Server( SPtr<SockIn> const& s, bool bRunModal );
-	~Server();
+	virtual ~Server();
 
 	int addReceiver( SPtr<SockIn> s );
 	int removeReceiver( SPtr<SockIn> s );

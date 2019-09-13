@@ -486,8 +486,8 @@ std::string	Socket::gethostbyaddr(const SocketAddress& sa)
 { 
 	char name[1096];
 	if( SOCKET_ERROR == getnameinfo((SOCKADDR*)&sa.sin_addr,sizeof(sa.sin_addr), name, 1096, NULL, 0, NI_NUMERICSERV ) )
-		return NULL;
-	return name;
+		return std::string(); // returning an empty string
+ 	return name;
 }
 
 //static
@@ -563,6 +563,7 @@ SockIn::~SockIn()
 
 UDPListener::UDPListener( SocketAddress& sa )
 	: SockIn( IPPROTO_UDP, sa )
+	, m_szRcvBuff( 0 ) 
 {
 	getRecvBuffSize( m_szRcvBuff );
 	char buff[20];
@@ -625,6 +626,8 @@ int TCPListener::getPeerIndex( TCPConnection const* pC ) const
 
 TCPConnection::TCPConnection( Socket const& other, SocketAddress const& peerAddress, TCPListener* pL, Server* pServer ) 
 : SockIn( other )
+, m_iRcvBuffSize(0)
+, m_iSndBuffSize( 0 )
 , m_iReadOffs(0)
 , m_peerAddr( peerAddress )
 , m_pListener( pL )
@@ -633,6 +636,7 @@ TCPConnection::TCPConnection( Socket const& other, SocketAddress const& peerAddr
 , m_iReadSize(0)
 , m_mtxRWIn( VWB_createMutex(false) )
 , m_mtxRWOut( VWB_createMutex(false) )
+, m_sto()
 {
 	getRecvBuffSize( m_iRcvBuffSize );
 	getSendBuffSize( m_iSndBuffSize );
@@ -644,6 +648,8 @@ TCPConnection::TCPConnection( Socket const& other, SocketAddress const& peerAddr
 
 TCPConnection::TCPConnection( SocketAddress connectTo ) // client connection
 : SockIn( IPPROTO_TCP, connectTo )
+, m_iRcvBuffSize( 0 )
+, m_iSndBuffSize( 0 )
 , m_iReadOffs(0)
 , m_peerAddr( connectTo )
 , m_pListener( NULL )
@@ -652,6 +658,7 @@ TCPConnection::TCPConnection( SocketAddress connectTo ) // client connection
 , m_iReadSize(0)
 , m_mtxRWIn( VWB_createMutex(false) )
 , m_mtxRWOut( VWB_createMutex(false) )
+, m_sto()
 {
 	char buff[20];
 	if( 0 != connect( connectTo ) )
@@ -1333,11 +1340,13 @@ Server::Server()
 , m_thread(0)
 , m_mtxGlobal( VWB_createMutex(false) ) 
 {
-	startSockets();
-	m_sto.tv_sec = 0;
-	m_sto.tv_usec = 16000;
-	FD_ZERO( &m_readers );
-	FD_ZERO( &m_writers );
+	ifStartSockets() 
+	{
+		m_sto.tv_sec = 0;
+		m_sto.tv_usec = 16000;
+		FD_ZERO( &m_readers );
+		FD_ZERO( &m_writers );
+	}
 };
 
 Server::Server( SPtr<SockIn> const& s, bool bRunModal )
@@ -1345,14 +1354,16 @@ Server::Server( SPtr<SockIn> const& s, bool bRunModal )
 , m_thread(0)
 , m_mtxGlobal( VWB_createMutex(false) )
 {
-	startSockets();
-	m_sto.tv_sec = 0;
-	m_sto.tv_usec = 16000;
-	FD_ZERO( &m_readers );
-	FD_ZERO( &m_writers );
-	addReceiver( s );
-	if( bRunModal )
-		doModal();
+	ifStartSockets()
+	{
+		m_sto.tv_sec = 0;
+		m_sto.tv_usec = 16000;
+		FD_ZERO( &m_readers );
+		FD_ZERO( &m_writers );
+		addReceiver( s );
+		if( bRunModal )
+			doModal();
+	}
 }
 
 Server::~Server()

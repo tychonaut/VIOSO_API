@@ -100,6 +100,7 @@ VWB_ERROR DX9WarpBlend::Init( VWB_WarpBlendSet& wbs )
 
 		RECT rC = { 0 };
 		if( FAILED( m_device->GetCreationParameters( &p ) ) ||
+			0 == p.hFocusWindow ||
 			!::GetClientRect( p.hFocusWindow, &rC ) )
 		{
 			logStr( 1, "WARNING: No window found, cannot set viewport.\n" );
@@ -116,8 +117,8 @@ VWB_ERROR DX9WarpBlend::Init( VWB_WarpBlendSet& wbs )
 			logStr( 2, "Window found. Viewport is %ux%u.\n", m_vp.Width, m_vp.Height );
 		}
 
-		if( FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_MANAGED, &m_texBlend, NULL ) ) ||
-			FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_MANAGED, &m_texWarp, NULL ) ) )
+		if( FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, ( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D ) ? D3DFMT_A32B32G32R32F : D3DFMT_G32R32F, D3DPOOL_MANAGED, &m_texBlend, NULL ) ) ||
+			FAILED( m_device->CreateTexture( m_sizeMap.cx, m_sizeMap.cy, 1, 0, D3DFMT_A16B16G16R16, D3DPOOL_MANAGED, &m_texWarp, NULL ) ) )
 		{
 			logStr( 0, "ERROR: Failed to create lookup textures.\n" );
 			throw VWB_ERROR_SHADER;
@@ -129,7 +130,18 @@ VWB_ERROR DX9WarpBlend::Init( VWB_WarpBlendSet& wbs )
 			logStr( 0, "ERROR: Failed to fill warp texture.\n" );
 			throw VWB_ERROR_WARP;
 		}
-		memcpy( r.pBits, wb.pWarp, sizeof( *wb.pWarp ) * m_sizeMap.cx * m_sizeMap.cy );
+		if( wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D )
+		{
+			memcpy( r.pBits, wb.pWarp, sizeof( *wb.pWarp ) * m_sizeMap.cx * m_sizeMap.cy );
+		}
+		else
+		{
+			for( float* d = (float*)r.pBits, *s = (float*)wb.pWarp, *sE = ( (float*)wb.pWarp ) + m_sizeMap.cx * m_sizeMap.cy; s != sE; d += 2, s += 4 )
+			{
+				d[0] = s[0];
+				d[1] = s[1];
+			}
+		}
 		m_texWarp->UnlockRect( 0 );
 
 		if( FAILED( m_texBlend->LockRect( 0, &r, NULL, 0 ) ) )
@@ -137,7 +149,7 @@ VWB_ERROR DX9WarpBlend::Init( VWB_WarpBlendSet& wbs )
 			logStr( 0, "ERROR: Failed to fill blend texture.\n" );
 			throw VWB_ERROR_BLEND;
 		}
-		memcpy( r.pBits, wb.pBlend3, sizeof( *wb.pBlend3 ) * m_sizeMap.cx * m_sizeMap.cy );
+		memcpy( r.pBits, wb.pBlend2, sizeof( *wb.pBlend2 ) * m_sizeMap.cx * m_sizeMap.cy );
 		m_texBlend->UnlockRect( 0 );
 
 		std::string pixelShader = "PS"; // or "TST"

@@ -558,13 +558,13 @@ typedef struct VWB_WarpBlendVertex
 	VWB_float rgb[3]; // blend factor [0..1]
 } VWB_WarpBlendVertex;
 
-typedef struct VWB_WarpBlendMesh
+typedef struct VWB_WarpBlendMesh // a triangle list mesh
 {
-	VWB_uint nVtx;
-	VWB_WarpBlendVertex* vtx;
-	VWB_uint nIdx;
-	VWB_uint* idx;
-	VWB_size dim;
+	VWB_uint nVtx; // the number of vertices
+	VWB_WarpBlendVertex* vtx; // the vertices
+	VWB_uint nIdx; // number of indices
+	VWB_uint* idx;  // the index list
+	VWB_size dim;  // the dimension of the calibrated display in pixels
 }VWB_WarpBlendMesh;
 
 //#ifdef WIN32
