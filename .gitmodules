@@ -1,3 +1,0 @@
-[submodule "glut"]
-	path = glut
-	url = https://github.com/tychonaut/glut.git
