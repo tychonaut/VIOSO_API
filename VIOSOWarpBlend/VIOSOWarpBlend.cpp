@@ -369,7 +369,11 @@ VWB_ERROR VWB_CreateA( void* pDxDevice, char const* szConfigFile, char const* sz
 		time_t t;
 		time( &t );
 		struct tm tm = *localtime( &t );
-		logStr( 1, "%04d/%02d/%02d VIOSOWarpBlend API %d.%d.%d.%d.\n", 1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday, VWB_Version_MAJ, VWB_Version_MIN, VWB_Version_MAI, VWB_Version_REV );
+		logStr( 1, "%04d/%02d/%02d VIOSOWarpBlend API %d.%d.%d.%s.\n",
+			1900 + tm.tm_year, 
+			1 + tm.tm_mon, 
+			tm.tm_mday, 
+			VWB_Version_MAJ, VWB_Version_MIN, VWB_Version_MAI, "VWB_Version_REV" );
 
 		char* szModPath = NULL;
 #ifdef WIN32

@@ -71,7 +71,14 @@ VWB_ERROR VWBTCPListener::sendInfoTo( SocketAddress sa )
 	char buf[SO_RCVBUF] = {0};
 	char buff[20];
 	try {
-		int pos = sprintf_s( buf, "VIOSOWarpBlend API %d.%d.%d.%d %Iu display(s) on %s:%hu.\015\012", VWB_Version_MAJ,VWB_Version_MIN,VWB_Version_MAI,VWB_Version_REV, m_warpers.size(), inaddr.getDottedDecimal(buff), inaddr.getPort() );
+		int pos = sprintf_s( 
+			buf, 
+			"VIOSOWarpBlend API %d.%d.%d.%s %Iu display(s) on %s:%hu.\015\012",
+			VWB_Version_MAJ,
+			VWB_Version_MIN,
+			VWB_Version_MAI,
+			"VWB_Version_REV", 
+			m_warpers.size(), inaddr.getDottedDecimal(buff), inaddr.getPort() );
 		for( WarperList::iterator it = m_warpers.begin(); it != m_warpers.end(); it++ )
 		{
 			VWB_Warper_base* p = (VWB_Warper_base*)*it;

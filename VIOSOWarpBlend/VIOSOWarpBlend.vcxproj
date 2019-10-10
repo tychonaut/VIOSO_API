@@ -456,22 +456,26 @@
   <ItemGroup>
     <ResourceCompile Include="VIOSOWarpBlend.rc" />
   </ItemGroup>
+  
+  
+  
   <ItemGroup>
     <CustomBuild Include="resource.h.subrev">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -479,19 +483,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -499,19 +503,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -519,19 +523,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -539,19 +543,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -559,19 +563,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -579,19 +583,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -599,19 +603,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -619,19 +623,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -639,19 +643,19 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-IF EXIST "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseSVN\bin\SubWCRev" $(ProjectDir) %(FullPath) %(FileName)
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
-ECHO ! subversion tool not found !
+ECHO ! git tool not found !
 )
 )
 )
@@ -659,6 +663,7 @@ ECHO ! subversion tool not found !
 )
 )
 </Command>
+
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">resource.h</Outputs>
@@ -672,6 +677,10 @@ ECHO ! subversion tool not found !
     </CustomBuild>
     <None Include="version.rc2" />
   </ItemGroup>
+  
+  
+  
+  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
