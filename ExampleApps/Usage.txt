@@ -1,0 +1,18 @@
+VIOSO Warp & Blend API
+
+This library is meant to be used in image generators, to do warping and blending. It takes a .vwf export and a texture buffer to sample from.
+If no texture buffer is given, it uses a copy of the current back buffer. It will render to the currently set back buffer.
+It provides image based warping, suitable for most cases and, if a 3D map is provided, dynamc eye warping.
+
+There are exampels provided, use Visual Studio 2010 or better.
+Copy contents VIOSOWarpBlend/bin to your output directory.
+Check VIOSOWarpBlend.log!
+
+You need DirectX June 2010 redistributable installed.
+Youn need a .vwf file containing geometry and softedge. Export it from VIOSO Calibrator,
+which is part of our VIOSO Anyblend suite.
+
+Download the latest VIOSO Anyblend demo here:
+http://www.vioso.com/de/downloads/
+
+Have fun!
