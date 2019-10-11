@@ -486,9 +486,10 @@ VWB_ERROR VWB_Init( VWB_Warper* pWarper )
 		return VWB_ERROR_PARAMETER;
 
 	VWB_ERROR err = VWB_ERROR_NONE;
+
 #ifdef _DEBUG
-	Scene SC;
-	loadDAE( SC, "..\\res\\dome_1.5m.dae" );
+	//Scene SC;
+	//loadDAE( SC, "..\\res\\dome_1.5m.dae" );
 #endif
 
 #ifdef _DEBUG

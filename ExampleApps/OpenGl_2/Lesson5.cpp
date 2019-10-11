@@ -14,7 +14,9 @@
 #include "../../Include/VIOSOWarpBlend.h"
 //#include "../VIOSOWarpBlend/Include/VIOSOWarpBlend.h"
 
-LPCTSTR s_configFile = _T("..\\Res\\VIOSOWarpBlend.ini");
+//LPCTSTR s_configFile = _T("..\\Res\\VIOSOWarpBlend.ini");  
+LPCTSTR s_configFile = _T("..\\ExampleApps\\Res\\VIOSOWarpBlend.ini");
+
 LPCTSTR s_warpDll = _T("VIOSOWarpBlend");
 LPCTSTR s_channel = _T("IG3");
 VWB_Warper* pWarper = NULL;
