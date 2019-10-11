@@ -4,9 +4,9 @@
 #define VWB_Version_MAJ 1
 #define VWB_Version_MIN 4
 #define VWB_Version_MAI 0
-#define VWB_Version_REV c79ab77c92639db2775fac107224cc9e72591eba
+#define VWB_Version_REV 6343550f876b07685c0b23d854f6479930ef838b
 #define VWB_Version_CUR 2019
-#define VWB_Version_DATE "2019/10/11 13:56:57"
+#define VWB_Version_DATE "2019/10/11 15:01:46"
 
 // Next default values for new objects
 // 
