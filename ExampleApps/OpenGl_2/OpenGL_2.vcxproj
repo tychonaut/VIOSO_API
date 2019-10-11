@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  
   <ItemGroup Label="ProjectConfigurations">
   
 	<ProjectConfiguration Include="Debug|Win32">
@@ -29,6 +33,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F30EDD02-E0C2-4D3A-896A-F2D5024777F9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+	<Platform>x64</Platform>
     <RootNamespace>OpenGL_2</RootNamespace>
   </PropertyGroup>
   

@@ -11,7 +11,8 @@
 
 //< start VIOSO API code
 #define VIOSOWARPBLEND_DYNAMIC_DEFINE_IMPLEMENT
-#include "../VIOSOWarpBlend/Include/VIOSOWarpBlend.h"
+#include "../../Include/VIOSOWarpBlend.h"
+//#include "../VIOSOWarpBlend/Include/VIOSOWarpBlend.h"
 
 LPCTSTR s_configFile = _T("..\\Res\\VIOSOWarpBlend.ini");
 LPCTSTR s_warpDll = _T("VIOSOWarpBlend");
@@ -518,7 +519,8 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 
 //< start VIOSO API code
 	#define VIOSOWARPBLEND_DYNAMIC_INITIALIZE
-	#include "../VIOSOWarpBlend/Include/VIOSOWarpBlend.h"
+	#include "../../Include/VIOSOWarpBlend.h"
+	//#include "../VIOSOWarpBlend/Include/VIOSOWarpBlend.h"
 
 	if( NULL == VWB_Create || 
 		VWB_ERROR_NONE != VWB_Create( NULL, s_configFile, s_channel, &pWarper, 1, NULL ) )
