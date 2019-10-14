@@ -929,7 +929,16 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 		wb.header.vPartialCnt[1] = 1; // top
 		wb.header.vPartialCnt[2] = 0; // right
 		wb.header.vPartialCnt[3] = 0; // bottom
-		VWB_BlendRecord3* pB = wb.pBlend3;
+		
+		
+		
+		//VWB_BlendRecord3* pB = wb.pBlend3; // why do they use blend3, i.e. float32, where their default is u16?
+
+		//HACK try:
+		VWB_BlendRecord2* pB = wb.pBlend2;
+		
+		
+		
 		for( VWB_WarpRecord* pW = wb.pWarp, *pWE = wb.pWarp + m_sizeMap.cx * m_sizeMap.cy; pW != pWE; pW++, pB++ )
 		{
 			if(0.5f <= pW->z && ( 0 < pB->r || 0 < pB->g || 0 < pB->b))
@@ -1049,7 +1058,22 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 	{
 		// transfer warp mask to blend
 		VWB_WarpRecord* pW = wb.pWarp;
-		for( VWB_BlendRecord3* p = wb.pBlend3, *pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pW++ )
+
+		for( 
+			//again, why blend3 when blend2 is default?
+			//VWB_BlendRecord3* p = wb.pBlend3, 
+			//*pE = wb.pBlend3 + m_sizeMap.cx * m_sizeMap.cy; 
+
+			//HACK try blend2, i.e. u16 after mem access violation
+			VWB_BlendRecord2* p = wb.pBlend2,
+			*pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; 
+
+			//HACK try blend1, i.e. u8 after mem access violation
+			//VWB_BlendRecord* p = wb.pBlend,
+			//* pE = wb.pBlend + m_sizeMap.cx * m_sizeMap.cy;
+
+			p != pE; 
+			p++, pW++ )
 		{
 			if( 0.5 > pW->z )
 			{

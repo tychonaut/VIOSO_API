@@ -61,7 +61,7 @@ VWB_ERROR LoadVWF( VWB_WarpBlendSet& set, char const* path )
 	do
 	{
 		VWB_WarpBlendSet::size_type nBefore = set.size();
-		pP2 = strchr( pP, ',' );
+		pP2 = strchr( pP, ',' ); //check for comma in string, popy wholhe strig or just until before the comma
 		if( pP2 )
 			strncpy_s( pp, pP, pP2 - pP );
 		else
@@ -74,7 +74,7 @@ VWB_ERROR LoadVWF( VWB_WarpBlendSet& set, char const* path )
 		if( NO_ERROR == ( err = fopen_s( &f, pp, "rb" ) ) )
 		{
 			logStr( 2, "File found and openend.\n" );
-			VWB_WarpSetFileHeader h0;
+			VWB_WarpSetFileHeader h0;		/* VWB_WarpSetFileHeader:	char magicNumber[4];VWB_uint numBlocks;	VWB_uint offs; VWB_uint reserved;*/
 			int nSets = 1;
 			while( nSets )
 			{
@@ -87,24 +87,50 @@ VWB_ERROR LoadVWF( VWB_WarpBlendSet& set, char const* path )
 					case '0fwv':
 						{
 							logStr( 2, "Load warp map %d...\n", VWB_uint(set.size()) );
-							VWB_WarpBlend* pWB = new VWB_WarpBlend;
-							memset( pWB, 0, sizeof( VWB_WarpBlend ) );
+							VWB_WarpBlend* pWB = new VWB_WarpBlend;		// structure begins with VWB_WarpFileHeader4 ...
+							memset( pWB, 0, sizeof( VWB_WarpBlend ) );	// ... but is filled with VWB_WarpSetFileHeader
+						
+							/*copy  VWB_WarpSetFileHeader into beginning of VWB_WarpFileHeader4 */
+							/* VWB_WarpSetFileHeader:	char magicNumber[4]; VWB_uint numBlocks;	VWB_uint offs;  VWB_uint reserved;*/
+							/* VWB_WarpFileHeader4:	    char magicNumber[4]; VWB_uint szHdr;       VWB_uint flags;  VWB_uint hMonitor;*/
 							memcpy( pWB, &h0, sizeof( h0 ) );
+
 							// read remainder of header
-							size_t sh = sizeof( pWB->header );
-							if( sh > pWB->header.szHdr )
+							size_t sh = sizeof( pWB->header );		//"big size", i.e. sizeof(VWB_WarpFileHeader4);
+							if( sh > pWB->header.szHdr )			//shrink "big size" to size indicator in file; (i.e. not all entries will be used)
 								sh = pWB->header.szHdr;
-							size_t s1 = sizeof( h0 );
-							size_t s2 = sizeof( pWB->header );
-							if( sh > s1 && 1 == fread_s( ((char*)&pWB->header) + s1, s2 - s1, sh - s1, 1, f ) )
+
+							size_t s1 = sizeof( h0 );			    // "small size", i.e. sizeof(VWB_WarpSetFileHeader),  4*32bit
+							size_t s2 = sizeof( pWB->header );		// non-downsized "big size", i.e. sizeof(VWB_WarpFileHeader4);
+
+							if( (sh > s1) 
+								&& 1 == fread_s( 
+									((char*)&pWB->header) + s1,  // buffer: offset of minimal size (first 4*32bit already read)
+									s2 - s1,	// buffer size : big size- minimal
+									sh - s1,	// element size: downscaled - minimial size
+									1,  // element count: one item
+									f ) //file
+							)
 							{
-								fseek( f, (long)pWB->header.szHdr - (long)sh, SEEK_CUR );
+								// progress by usually zero bytes, unless the "big header" is smaller than the file content associated with it;
+								// in other words: skip the content in the file that is not used in the VWB_WarpFileHeader4 structure definition;
+								fseek( f, 
+									(long) pWB->header.szHdr - (long) sh, 
+									SEEK_CUR );
+
 								int nRecords = pWB->header.width * pWB->header.height;
+								// if there is sth to warp/blend and there is a valid monitor handle:
 								if( 0 != nRecords && 0 != pWB->header.hMonitor )
 								{
 									strcpy( pWB->path, pp );
+
+									//read all expected warp records into the file
 									pWB->pWarp = new VWB_WarpRecord[nRecords];
-									if( nRecords == fread_s( pWB->pWarp, nRecords * sizeof( VWB_WarpRecord ), sizeof( VWB_WarpRecord ), nRecords, f ) )
+									if( nRecords == 
+											fread_s( pWB->pWarp, 
+													 nRecords * sizeof( VWB_WarpRecord ), 
+												     sizeof( VWB_WarpRecord ), 
+													 nRecords, f ) )
 									{
 										set.push_back( pWB );
 

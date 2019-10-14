@@ -18,7 +18,10 @@
 LPCTSTR s_configFile = _T("..\\ExampleApps\\Res\\VIOSOWarpBlend.ini");
 
 LPCTSTR s_warpDll = _T("VIOSOWarpBlend");
-LPCTSTR s_channel = _T("IG3");
+
+//LPCTSTR s_channel = _T("IG3");
+LPCTSTR s_channel = _T("IG0"); 
+
 VWB_Warper* pWarper = NULL;
 //< end VIOSO API code
 
@@ -77,10 +80,12 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 	GLfloat view[16], proj[16];
 	GLfloat eye[3] = { 0,0,0 };
 	GLfloat rot[3] = { 0,0,0 };
-	//< start VIOSO API code
-	if (pWarper && VWB_getViewProj)
-		VWB_getViewProj(pWarper, eye, rot, view, proj);
-	//< end VIOSO API code
+	
+	
+	////< start VIOSO API code
+	//if (pWarper && VWB_getViewProj)
+	//	VWB_getViewProj(pWarper, eye, rot, view, proj);
+	////< end VIOSO API code
 
 
 
@@ -152,10 +157,10 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 	glEnd();											// Done Drawing The Quad
 
 
-		//< start VIOSO API code
-	if (pWarper && VWB_render)
-		VWB_render(pWarper, (VWB_param)-1, VWB_STATEMASK_ALL);// VWB_STATEMASK_DEFAULT);// VWB_STATEMASK_STANDARD););
-	//< end VIOSO API code
+	//	//< start VIOSO API code
+	//if (pWarper && VWB_render)
+	//	VWB_render(pWarper, (VWB_param)-1, VWB_STATEMASK_ALL);// VWB_STATEMASK_DEFAULT);// VWB_STATEMASK_STANDARD););
+	////< end VIOSO API code
 
 
 	rtri+=0.2f;											// Increase The Rotation Variable For The Triangle ( NEW )
