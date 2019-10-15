@@ -34,16 +34,21 @@ GLchar const* s_szPasstrough_vertex_shader_v330 =
 "	vec2(1,1)															\n"
 ");																		\n"
 "																		\n"
-"uniform vec4 offsScale;												\n"
-"uniform vec4 size;														\n"
+"uniform vec4 offsScale;												\n" //sth. to do with "partial input"; fefault is (0,0,1,1)
+"uniform vec4 size;														\n"	// weird: size = (viewportsize.xy, 1/viewportsize.xy)
 "																		\n"
 "void main(void) {														\n"
-"	gl_Position = vec4((pos[gl_VertexID].x + pos[gl_VertexID].x * size.x) * size.z, (pos[gl_VertexID].y + pos[gl_VertexID].y * size.y) * size.w, 0.0, 1.0);\n"
-//"	gl_Position = vec4(pos[gl_VertexID], 0.0, 1.0);\n"
+"	gl_Position =														\n"    //transform from [-1,+1] to [sigthly less then -1, slightly more than +1], 
+"		vec4( (pos[gl_VertexID].x + pos[gl_VertexID].x * size.x) * size.z, \n" //  make slightly bigger, namely by inverse viewport size
+"             (pos[gl_VertexID].y + pos[gl_VertexID].y * size.y) * size.w, \n"
+"             0.0, 1.0);												\n"
+"																		\n"
 "	texcoord = tex[gl_VertexID];										\n"
 "	texcoord-= offsScale.xy; 											\n"
 "	texcoord*= offsScale.zw; 											\n"
 "}																		\n";
+//"	gl_Position = vec4(pos[gl_VertexID], 0.0, 1.0);\n"
+
 
 GLchar const* s_fragment_shader_header_v110 =
 "#version 110															\n"
@@ -118,7 +123,7 @@ GLchar const* s_warp_blend_fragment_shader =
 "{																		\n"
 "	vec4 tex = _tex2D( samWarp,texcoord.st );						\n"
 "	vec4 blend = _tex2D( samBlend, texcoord.st );					\n"
-"	if( 0.1 < blend.a )													\n"
+"	if( blend.a > 0.1 )											      \n"
 "	{																	\n"
 "		tex.y = 1.0 - tex.y;											\n"
 "		if( bBorder )													\n"
@@ -136,7 +141,7 @@ GLchar const* s_warp_blend_fragment_shader =
 "	}																	\n"
 "	else																\n"	
 "	{																	\n"
-"		FragColor = vec4( 0.0,0.0,0.0,1.0 );							\n"
+"		FragColor = blend; //vec4( 0.0,0.0,1.0,1.0 );							\n"  //HACK TEST blue debug color
 "	}																	\n"
 "}																		\n";
                                                                         
@@ -145,7 +150,7 @@ GLchar const* s_warp_blend_fragment_shader_3D =
 "{                                               						\n"
 "	vec4 tex = _tex2D( samWarp, texcoord.st );     					\n"
 "	vec4 blend = _tex2D( samBlend, texcoord.st );  					\n"
-"	if( 0.1 < blend.a )                            						\n"
+"	if( blend.a > 0.1 )                            						\n"
 "	{                                           						\n"
 "		tex/= blend.a;                            						\n"
 "		tex.a = 1;                            						\n"
@@ -161,6 +166,6 @@ GLchar const* s_warp_blend_fragment_shader_3D =
 "	}                                           						\n"
 "	else																\n"
 "	{																	\n"
-"		FragColor = vec4( 0.0,0.0,0.0,1.0 );							\n"
+"		FragColor = vec4( 0.0,1.0,0.0,1.0 );							\n" //HACK TEST green debug color
 "	}																	\n"
 "}																		\n";

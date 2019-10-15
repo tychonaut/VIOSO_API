@@ -747,8 +747,8 @@ VWB_ERROR GLWarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 		SetTexture( m_locBlend, m_texBlend );
 		SetTexture( m_locContent, iSrc );
 
-		//res = glGetError();
-		//if( GL_NO_ERROR == res )
+		res = glGetError(); //commented in
+		if( GL_NO_ERROR == res ) //commented in
 		{
 			if (m_bDynamicEye)
 				glUniformMatrix4fv( m_locMatView, 1, GL_TRUE, m_mVP );
@@ -767,8 +767,12 @@ VWB_ERROR GLWarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 			else
 				glUniform4f( m_locOffsScale,  0.0f, 0.0f, 1.0f, 1.0f );
 
-			glClearColor( 0, 0, 0, 1 );
+			//glClearColor( 0, 0, 0, 1 );
+			glClearColor(1, 0, 0, 1);
+
+
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 			if (bUseGL110)
 			{
 				glMatrixMode( GL_MODELVIEW );
@@ -829,7 +833,13 @@ VWB_ERROR GLWarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 			else
 			{
 				glBindVertexArray(m_iVertexArray);
-				glUniform4f( m_locSize, (GLfloat)viewport[2], (GLfloat)viewport[3],1.0f/viewport[2], 1.0f/viewport[3] );
+
+				glUniform4f( m_locSize, 
+					(GLfloat)viewport[2], 
+					(GLfloat)viewport[3],
+					1.0f/viewport[2], 
+					1.0f/viewport[3] );
+
 				glDisable(GL_DEPTH_TEST); 
 				glDisable(GL_CLIP_PLANE0);
 				glDisable(GL_CLIP_PLANE1);
@@ -998,8 +1008,8 @@ VWB_ERROR GLWarpBlend::RenderX( VWB_param inputTexture, VWB_uint stateMask )
 		glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &m_sizeIn.cx );
 		glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &m_sizeIn.cy );
 
-		//res = glGetError();
-		//if( GL_NO_ERROR == res )
+		res = glGetError();
+		if( GL_NO_ERROR == res )
 		{
 			if( m_bDynamicEye )
 				glUniformMatrix4fv( m_locMatView, 1, GL_TRUE, m_mVP );
@@ -1010,10 +1020,10 @@ VWB_ERROR GLWarpBlend::RenderX( VWB_param inputTexture, VWB_uint stateMask )
 			glUniform1i( m_locDoNotBlend, bDoNotBlend );
 			if( bPartialInput )
 				glUniform4f( m_locOffsScale,
-				(GLfloat)optimalRect.left / (GLfloat)optimalRes.cx,
-							 (GLfloat)optimalRect.top / (GLfloat)optimalRes.cy,
-							 (GLfloat)optimalRes.cx / ( (GLfloat)optimalRect.right - (GLfloat)optimalRect.left ),
-							 (GLfloat)optimalRes.cy / ( (GLfloat)optimalRect.bottom - (GLfloat)optimalRect.top )
+							 (GLfloat)optimalRect.left / (GLfloat)optimalRes.cx,
+							 (GLfloat)optimalRect.top  / (GLfloat)optimalRes.cy,
+							 (GLfloat)optimalRes.cx    / ( (GLfloat)optimalRect.right - (GLfloat)optimalRect.left ),
+							 (GLfloat)optimalRes.cy    / ( (GLfloat)optimalRect.bottom - (GLfloat)optimalRect.top )
 				);
 			else
 				glUniform4f( m_locOffsScale, 0.0f, 0.0f, 1.0f, 1.0f );
@@ -1089,6 +1099,9 @@ VWB_ERROR GLWarpBlend::RenderX( VWB_param inputTexture, VWB_uint stateMask )
 				glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 				glBindVertexArray( oldVA );
 			}
+
+			res = glGetError();
+
 		}
 	}
 
