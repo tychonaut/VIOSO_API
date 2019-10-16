@@ -767,10 +767,7 @@ VWB_ERROR GLWarpBlend::Render( VWB_param inputTexture, VWB_uint stateMask )
 			else
 				glUniform4f( m_locOffsScale,  0.0f, 0.0f, 1.0f, 1.0f );
 
-			//glClearColor( 0, 0, 0, 1 );
-			glClearColor(1, 0, 0, 1);
-
-
+			glClearColor(0, 0, 0, 1);
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 			if (bUseGL110)

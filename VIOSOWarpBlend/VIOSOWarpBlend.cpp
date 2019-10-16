@@ -816,6 +816,8 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 			p->r = 65535;
 			p->g = 65535;
 			p->b = 65535;
+
+			p->a = 65535; // new, otherwise it will be 1;
 		}
 		wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
 		wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV2;
@@ -836,7 +838,8 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				pD->r = VWB_word( pow( p->r, g ) * 65535.0f );
 				pD->g = VWB_word( pow( p->g, g ) * 65535.0f );
 				pD->b = VWB_word( pow( p->b, g ) * 65535.0f );
-				pD->a = VWB_word( p->a * 65535.0f );
+
+				pD->a = VWB_word(      p->a      * 65535.0f );
 			}
 			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
 			wb.header.flags|= FLAG_SP_WARPFILE_HEADER_BLENDV2;
@@ -850,7 +853,10 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				p->r = VWB_word( pow( VWB_float( p->r ) / 65535.0f, g ) * 65535.0f );
 				p->g = VWB_word( pow( VWB_float( p->g ) / 65535.0f, g ) * 65535.0f );
 				p->b = VWB_word( pow( VWB_float( p->b ) / 65535.0f, g ) * 65535.0f );
-				// p->a stays untouched
+				
+				// p->a stays untouched   
+				// <-- NO! must be scales from [0..1] to [0..]
+				//p->a = VWB_word(p->a * 65535.0f);
 			}
 		}
 		else
@@ -862,7 +868,8 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				pD->r = VWB_word( pow( VWB_float( p->r ) / 255.0f, g ) * 65535.0f );
 				pD->g = VWB_word( pow( VWB_float( p->g ) / 255.0f, g ) * 65535.0f );
 				pD->b = VWB_word( pow( VWB_float( p->b ) / 255.0f, g ) * 65535.0f );
-				pD->a = VWB_word( p->a ) * 255;
+
+				pD->a = VWB_word(       p->a                          ) * 255;
 			}
 			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV3;
 			wb.header.flags|= FLAG_SP_WARPFILE_HEADER_BLENDV2;
@@ -881,6 +888,7 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				pD->r = VWB_word( p->r * 65535.0f );
 				pD->g = VWB_word( p->g * 65535.0f );
 				pD->b = VWB_word( p->b * 65535.0f );
+
 				pD->a = VWB_word( p->a * 65535.0f );
 			}
 			wb.header.flags&= ~FLAG_SP_WARPFILE_HEADER_BLENDV3;
@@ -897,6 +905,7 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				pD->r = VWB_word( p->r * 255.0f );
 				pD->g = VWB_word( p->g * 255.0f );
 				pD->b = VWB_word( p->b * 255.0f );
+
 				pD->a = VWB_word( p->a * 255.0f );
 			}
 			wb.header.flags|=  FLAG_SP_WARPFILE_HEADER_BLENDV2;
@@ -911,14 +920,18 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 	{
 		for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pW++ )
 		{
-			p->a = pW->w;
+			//p->a = pW->w; // <-- old code: write [0..1] to unsigned short; bad...
+			//new code:
+			p->a = static_cast<VWB_word>(pW->w * 65535.0f);
 		}
 	}
 	else
 	{
 		for( VWB_BlendRecord2* p = wb.pBlend2, *pE = wb.pBlend2 + m_sizeMap.cx * m_sizeMap.cy; p != pE; p++, pW++ )
 		{
-			p->a = pW->z;
+			//p->a = pW->z; // <-- old code: write [0..1] to unsigned short; bad...
+			//new code:
+			p->a = static_cast<VWB_word>(pW->z * 65535.0f);
 		}
 	}
 
@@ -1083,7 +1096,10 @@ VWB_ERROR VWB_Warper_base::Init( VWB_WarpBlendSet& wbs )
 				p->a = 0;
 			}
 			else
-				p->a = pW->z;
+			{
+				//p->a = pW->z;
+				p->a = static_cast<VWB_word>(pW->z * 65535.0f);
+			}
 		}
 
 		if( bAutoView )

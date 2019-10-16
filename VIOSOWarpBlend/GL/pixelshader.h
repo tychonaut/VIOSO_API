@@ -141,7 +141,7 @@ GLchar const* s_warp_blend_fragment_shader =
 "	}																	\n"
 "	else																\n"	
 "	{																	\n"
-"		FragColor = blend; //vec4( 0.0,0.0,1.0,1.0 );							\n"  //HACK TEST blue debug color
+"		FragColor =  vec4( 0.0,0.0,0.0,1.0 );	//tex; //blend;						\n"  //HACK TEST blue debug color
 "	}																	\n"
 "}																		\n";
                                                                         

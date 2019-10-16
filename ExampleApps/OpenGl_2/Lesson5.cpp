@@ -87,7 +87,7 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 		VWB_getViewProj(pWarper, eye, rot, view, proj);
 	//< end VIOSO API code
 
-
+	glEnable(GL_DEPTH_TEST);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	glLoadIdentity();									// Reset The Current Modelview Matrix
