@@ -27,6 +27,15 @@
 #include "logging.h"
 #include "3rdparty/delauney/DelaunayTriangles.h"
 
+
+
+
+
+
+
+
+
+
 VWB_size _size0 = { 0,0 };
 #ifdef WIN32
 Server g_server;

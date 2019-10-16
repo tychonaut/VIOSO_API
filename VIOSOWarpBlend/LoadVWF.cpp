@@ -1,3 +1,4 @@
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING //too lazy to further hassle with window's idiosynchratic string types
 #include "Platform.h"
 
 #include "LoadVWF.h"
@@ -7,18 +8,256 @@
 
 #include <stdlib.h>
 
+
+//{ Own PFM export code of warp & blend maps
+//  derived from https://github.com/dscharstein/pfmLib/blob/master/ImageIOpfm.cpp
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>
+#include <locale>
+#include <codecvt>
+#include <assert.h>
+
+//using uchar =  unsigned char;
+using byte = char;
+
+// check whether machine is little endian
+int littleendian()
+{
+	int intval = 1;
+	byte* rawPtr = reinterpret_cast<byte*> (& intval);
+	return rawPtr[0] == 1;
+}
+
+//void swapBytes(float* fptr) { // if endianness doesn't agree, swap bytes
+//	byte* ptr = (byte*)fptr;
+//	byte tmp = 0;
+//	tmp = ptr[0]; ptr[0] = ptr[3]; ptr[3] = tmp;
+//	tmp = ptr[1]; ptr[1] = ptr[2]; ptr[2] = tmp;
+//}
+
+
+
+template<typename T>
+bool saveAsPFM(
+	T const* const  imageData,
+	size_t width,
+	size_t height,
+	const std::string& filepath,
+	size_t numChannelsToWrite, // 3 or 1 (other types not supported by PFM iirc)
+	bool export_Z_as_zero = false, // for 2D warp file encoded as PFM
+	size_t numChannelsInData = 4
+)
+{
+	std::fstream pfmFile(filepath.c_str(), std::ios::out | std::ios::binary);
+
+	// scale integral value range to [0.0f..1.0f], i.e.  by 1/(max.integral value)
+	const float scaleFactor = 
+		(std::is_integral<T>::value) 
+		? 1.0f / static_cast<float>(std::numeric_limits<T>::max())
+		: 1.0f;
+	
+	std::string formatID = "";
+	switch (numChannelsToWrite)
+	{       // determine identifier string based on image type
+	case 1:
+		assert("color to gray conversion not implemented" && numChannelsInData == 1);
+		formatID = "Pf";   // grayscale
+		break;
+	case 3:
+		assert("enough channels exist" && numChannelsInData >= 3);
+		formatID = "PF";   // color
+		break;
+	default:
+		std::cout << "Unsupported channel size, must be 3 or 1";
+		return false;
+	}
+
+	// sign of scalefact indicates endianness, see pfms specs
+	float endianessEncoder = littleendian() ? -1.0f : 1.0f;
+
+	// insert header information 
+	pfmFile << formatID << "\n";
+	pfmFile << width << " ";
+	pfmFile << height << "\n";
+	pfmFile << endianessEncoder << "\n";
+
+	//some log output:
+	std::string logMsg; 
+	logMsg = std::string("Writing image to pfm file: ") + filepath + std::string("\n")
+		+ "Little Endian?: " + ((littleendian()) ? "true" : "false") + std::string("\n")
+		+ "width: " + std::to_string(width) + std::string("\n")
+		+ "height: " + std::to_string(height) + std::string("\n")
+		+ "endianessEncoder: " + std::to_string(endianessEncoder) + std::string("\n");
+	logStr(4, "%s", logMsg.c_str());
+
+	//std::cout << std::setfill('=') << std::setw(19) << "=" << std::endl;
+	//std::cout << "Writing image to pfm file: " << filepath << std::endl;
+	//std::cout << "Little Endian?: " << ((littleendian()) ? "true" : "false") << std::endl;
+	//std::cout << "width: " << width << std::endl;
+	//std::cout << "height: " << height << std::endl;
+	//std::cout << "endianessEncoder: " << endianessEncoder << std::endl;
+
+	//uchar* rawDataPtr = reinterpret_cast<uchar*>(imageData);
+
+	const size_t bufferSize = width * height * numChannelsToWrite * sizeof(float);
+	float* writeBuffer = reinterpret_cast<float*>(malloc(bufferSize));
+	size_t bufferReadIdx = 0;
+	for (int rowIdx = int(height) - 1; rowIdx >= 0; --rowIdx) //invert rows, pfm has picture origin on lower left, not upper left like OpenGL and matrices
+	{
+		for (int colIdx = 0; colIdx < width; ++colIdx)
+		{
+			for (size_t channelIdx = 0; channelIdx < numChannelsToWrite; channelIdx++)
+			{
+				//size_t offset = 
+				//	sizeof(T) * (
+				//		(numChannelsInData * (
+				//				rowIdx * width 
+				//				+ 
+				//				colIdx
+				//			)
+				//		)
+				//		+ channelIdx 
+				//	);
+
+				size_t bufferWriteIdx =
+					(
+						numChannelsToWrite *
+						(
+							rowIdx * width
+							+
+							colIdx
+							)
+						)
+					+ channelIdx;
+
+				//convert channel value from arbitrary number type and scale accordingly
+				float valueToWrite = ( static_cast<float>( imageData[bufferReadIdx]) ) * scaleFactor;
+
+				if (export_Z_as_zero && channelIdx == 2)
+				{
+					valueToWrite = 0.0f;
+				}
+
+				writeBuffer[bufferWriteIdx] = valueToWrite;
+
+				bufferReadIdx++;
+			}
+			//jump over ignored channels
+			bufferReadIdx += (numChannelsInData - numChannelsToWrite);
+		}
+	}
+	pfmFile.write(reinterpret_cast<const byte*> (writeBuffer), bufferSize);
+	free(writeBuffer);
+
+
+
+	std::cout << std::setfill('=') << std::setw(19) << "=" << std::endl << std::endl;
+
+	return true;
+}
+
+
+
+std::string ws2s(const std::wstring& wstr)
+{
+	typedef std::codecvt_utf8<wchar_t> convert_typeX;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
+}
+
+std::string constructCalibIDString(const VWB_WarpBlend& wb)
+{
+	std::wstring ws_displayID(wb.header.displayID);
+	std::string calibID =  std::string(wb.header.name); 
+		//std::string(wb.header.primName) +
+		//+ ws2s(ws_displayID); //std::string(ws_displayID.begin(), ws_displayID.end());
+	return calibID;
+}
+
+bool exportWarp(const VWB_WarpBlend& wb)
+{	
+	static_assert( sizeof(VWB_float) == sizeof(float) );
+
+	return saveAsPFM<VWB_float>(
+		reinterpret_cast <VWB_float*> (wb.pWarp),
+		wb.header.width,
+		wb.header.height,
+		std::string("WARP_") + constructCalibIDString(wb) + std::string(".pfm"),
+		3,
+		// make blue channel zero if NOT 3D calib data
+		(wb.header.flags & FLAG_SP_WARPFILE_HEADER_3D) == 0,
+		4
+	);
+}
+
+bool exportBlend(const VWB_WarpBlend& wb)
+{
+	if (wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV3)
+	{
+		return saveAsPFM<VWB_float>(
+			reinterpret_cast <VWB_float*> (wb.pBlend3),
+			wb.header.width,
+			wb.header.height,
+			std::string("BLEND_") + constructCalibIDString(wb) + std::string(".pfm"),
+			3
+		);
+	}
+	else if (wb.header.flags & FLAG_SP_WARPFILE_HEADER_BLENDV2)
+	{
+		return saveAsPFM<VWB_word>(
+			reinterpret_cast <VWB_word*> (wb.pBlend2),
+			wb.header.width,
+			wb.header.height,
+			std::string("BLEND_") + constructCalibIDString(wb) + std::string(".pfm"),
+			3
+		);
+	}
+	else
+	{
+		assert(0 && "unsupported/unkown blending format");
+		return false;
+	}
+}
+//}
+
+
+
+
+
+
 bool DeleteVWF( VWB_WarpBlend& wb )
 {
-		if( wb.pWarp ) 
-			delete[] wb.pWarp;
-		if( wb.pBlend )
-			delete[] wb.pBlend;
-		if( wb.pBlack ) 
-			delete[] wb.pBlack;
-		if( wb.pWhite ) 
-			delete[] wb.pWhite;
-		wb.header.width = 0;
-		wb.header.height = 0;
+	//HACK dump warp&blend data to disk until vioso delivers some more useful exports of their calib data
+	exportWarp(wb);
+	exportBlend(wb); 
+
+
+	if (wb.pWarp)
+	{
+		delete[] wb.pWarp;
+	}
+	
+	if (wb.pBlend)
+	{
+		delete[] wb.pBlend;
+	}
+
+	if (wb.pBlack)
+	{
+		delete[] wb.pBlack;
+	}
+	
+	if (wb.pWhite)
+	{
+		delete[] wb.pWhite;
+	}
+	
+	wb.header.width = 0;
+	wb.header.height = 0;
+	
 	return true;
 }
 

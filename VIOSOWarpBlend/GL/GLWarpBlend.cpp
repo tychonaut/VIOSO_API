@@ -5,6 +5,16 @@
 #include "GLext.h"
 
 GLfloat colBlack[4] = {0,0,0,0};
+
+
+
+
+
+
+
+
+
+
 //save a texture to .tif image
 bool savetex (char filename[MAX_PATH],GLint iTex)
 {// get the image data
