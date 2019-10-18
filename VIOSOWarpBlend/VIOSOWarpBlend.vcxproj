@@ -41,6 +41,14 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3ABC932E-A0F3-4F8F-80D9-E5756F57EA64}</ProjectGuid>
@@ -80,6 +88,13 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -95,6 +110,13 @@
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -133,6 +155,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -140,6 +165,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'" Label="PropertySheets">
@@ -171,6 +199,10 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\bin\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\bin\</OutDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\bin\</OutDir>
@@ -180,6 +212,11 @@
     <OutDir>F:\Titan_2017\Titan\plugins\VIOSOWarpBlend\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)64</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)64</TargetName>
@@ -277,6 +314,32 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MinimalRebuild />
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <AdditionalOptions>/std:c++17 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <MinimalRebuild>
+      </MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -341,9 +404,34 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions);_M_X64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)addon\lib;%(AdditionalLibraryDirectories);$(DXSDK_DIR)lib\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VIOSOWARPBLEND_EXPORTS;%(PreprocessorDefinitions);_M_X64</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)addon</AdditionalIncludeDirectories>
+      <MinimalRebuild>
+      </MinimalRebuild>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -439,11 +527,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="LoadDAE.cpp" />
@@ -521,6 +611,26 @@ ECHO ! git tool not found !
 )
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! git tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
 IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
@@ -640,6 +750,26 @@ ECHO ! git tool not found !
 )
 )
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+IF EXIST "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramW6432%\Tools\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
+) ELSE (
+ECHO ! git tool not found !
+)
+)
+)
+)
+)
+)
+</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">IF EXIST "%ProgramFiles%\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
 ) ELSE (
 IF EXIST "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev.exe" ( "%ProgramFiles%\Develop\TortoiseGit\bin\GitWCRev" $(ProjectDir) %(FullPath) %(FileName)
@@ -664,11 +794,13 @@ ECHO ! git tool not found !
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unity|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unity|Win32'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Unity|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseTitan|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">resource.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">resource.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Unity|x64'">resource.h</Outputs>
     </CustomBuild>
     <None Include="version.rc2" />

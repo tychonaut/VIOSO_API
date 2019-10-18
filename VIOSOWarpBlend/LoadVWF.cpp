@@ -104,8 +104,11 @@ bool saveAsPFM(
 	const size_t bufferSize = width * height * numChannelsToWrite * sizeof(float);
 	float* writeBuffer = reinterpret_cast<float*>(malloc(bufferSize));
 	size_t bufferReadIdx = 0;
+
+	#pragma loop( hint_parallel( 8 ) )
 	for (int rowIdx = int(height) - 1; rowIdx >= 0; --rowIdx) //invert rows, pfm has picture origin on lower left, not upper left like OpenGL and matrices
 	{
+		#pragma loop( hint_parallel( 8 ) )
 		for (int colIdx = 0; colIdx < width; ++colIdx)
 		{
 			for (size_t channelIdx = 0; channelIdx < numChannelsToWrite; channelIdx++)
@@ -149,7 +152,7 @@ bool saveAsPFM(
 		}
 	}
 	pfmFile.write(reinterpret_cast<const byte*> (writeBuffer), bufferSize);
-	free(writeBuffer);
+	//free(writeBuffer);
 
 
 
