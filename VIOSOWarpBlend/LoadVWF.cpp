@@ -10,7 +10,7 @@
 
 
 //{ Own PFM export code of warp & blend maps
-//  derived from https://github.com/dscharstein/pfmLib/blob/master/ImageIOpfm.cpp
+//  derived frohttps://github.com/dscharstein/pfmLib/blob/master/ImageIOpfm.cpp
 #include <iostream>
 #include <iomanip>
 #include <fstream>
